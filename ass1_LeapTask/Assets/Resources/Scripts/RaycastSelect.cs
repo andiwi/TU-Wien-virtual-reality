@@ -48,14 +48,16 @@ public class RaycastSelect : MonoBehaviour
         // fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
         Leap.Finger finger = gameObject.GetComponent<CapsuleHand>().GetLeapHand().Fingers[1]; //TODO check if correct finger (INDEX)
 
-        fingerDir = finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL).Direction.ToVector3(); 
+        fingerDir = finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
         fingerPos = finger.TipPosition.ToVector3();
         ray.origin = fingerPos;
         ray.direction = fingerDir;
 
         //   _anchor.transform.parent = transform.parent; //transform parent 
-        RaycastHit hit;
 
+
+        RaycastHit hit;
+        //    if (Physics.Raycast(ray, out hit,Camera.main.farClipPlane, LayerMask.NameToLayer("Moveable")))
         if (Physics.Raycast(ray, out hit))
         {
             Moveable pickupObject = hit.collider.GetComponent<Moveable>();
@@ -63,19 +65,39 @@ public class RaycastSelect : MonoBehaviour
 
             if (pickupObject != null)
             {
-                Debug.DrawRay(transform.position, pickupObject.gameObject.transform.position, Color.blue);
-                drawLine(transform.position, transform.position + ray.direction * 10000, Color.blue);
+
 
                 if (selectedObject != pickupObject.gameObject)
                 {
+                    if (selectedObject != null)
+                    {
+                        //reset color of old selected object
+                        selectedObject.GetComponent<Renderer>().material.color = Color.white;
+                    }
 
+                    //new selectedObject
                     selectedObject = pickupObject.gameObject;
+                    selectedObject.GetComponent<Renderer>().material.color = Color.blue;
 
                 }
+
+                Debug.DrawRay(transform.position, transform.position + ray.direction * 10000, Color.blue);
+                drawLine(transform.position, transform.position + ray.direction * 10000, Color.blue);
             }
+            else
+            {
+                Debug.DrawRay(transform.position, transform.position + ray.direction * 10000, Color.red);
+                drawLine(transform.position, transform.position + ray.direction * 10000, Color.red);
+            }
+
         }
         else
         {
+            if (selectedObject != null)
+            {
+                //reset color of old selected object
+                selectedObject.GetComponent<Renderer>().material.color = Color.white;
+            }
 
             Debug.DrawRay(transform.position, transform.position + ray.direction * 10000, Color.red);
             drawLine(transform.position, transform.position + ray.direction * 10000, Color.red);
@@ -96,18 +118,29 @@ public class RaycastSelect : MonoBehaviour
 
     public void StartCarrying()
     {
-        carrying = true;
-        selectedObject.GetComponent<Rigidbody>().isKinematic = true;
+        Debug.Log("StartCarrying()");
+        if (selectedObject != null)
+        {
+            Debug.Log("StartCarrying selectedObject ");
+            carrying = true;
+            selectedObject.GetComponent<Rigidbody>().isKinematic = true;
+            selectedObject.GetComponent<Renderer>().material.color = Color.yellow;
 
+        }
 
     }
 
     public void StopCarrying()
     {
-        carrying = false;
-        selectedObject.GetComponent<Rigidbody>().isKinematic = false;
-        selectedObject.gameObject.GetComponent<Renderer>().material.color = Color.white;
-        selectedObject.transform.parent = null;
+        Debug.Log("StopCarrying()");
+        if (selectedObject != null)
+        {
+            Debug.Log("StopCarrying selectedObject ");
+            carrying = false;
+            selectedObject.GetComponent<Rigidbody>().isKinematic = false;
+            selectedObject.gameObject.GetComponent<Renderer>().material.color = Color.white;
+            //selectedObject.transform.parent = null;
+        }
     }
 
     private void drawLine(Vector3 start, Vector3 end, Color color)
@@ -121,9 +154,9 @@ public class RaycastSelect : MonoBehaviour
     private void carry(GameObject foo)
     {
 
-        //foo.transform.position = Camera.current.transform.position + Camera.current.transform.forward * Vector3.Distance(Camera.current.transform.position, foo.transform.position);
+        foo.transform.position = Camera.main.transform.position + Camera.main.transform.forward * Vector3.Distance(Camera.main.transform.position, foo.transform.position);
 
-        foo.transform.parent = transform; //TODO maybe change back
+        //foo.transform.parent = transform; //TODO maybe change back
         Debug.DrawRay(transform.position, foo.transform.position, Color.yellow);
         drawLine(transform.position, foo.transform.position, Color.yellow);
     }
