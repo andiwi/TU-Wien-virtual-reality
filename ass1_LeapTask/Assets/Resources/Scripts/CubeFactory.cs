@@ -42,9 +42,6 @@ public class CubeFactory : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		cubeCreationRunning = false;
-
-		cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		cube.transform.position = new Vector3(1, 1, 1);
 	}
 
 	public void StartCubeCreation() {
