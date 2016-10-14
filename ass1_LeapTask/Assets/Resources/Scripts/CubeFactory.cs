@@ -28,20 +28,20 @@ public class CubeFactory : MonoBehaviour {
 			_pinchDetectorR = value;
 		}
 	}
-
-	private GameObject cube;
+ 
+    private GameObject cube;
 
 	private bool cubeCreationRunning = false;
-	//private bool lposSet = false;
-	//private bool rposSet = false;
+    //private bool lposSet = false;
+    //private bool rposSet = false;
 
-	private float distance;
-	private Vector3 maxScaleSize = new Vector3(5,5,5);
-	private Vector3 minScaleSize = new Vector3(0.5f, 0.5f, 0.5f);
+    private float distance;
+	public Vector3 maxScaleSize = new Vector3(5,5,5);
+    public Vector3 minScaleSize = new Vector3(0.05f, 0.05f, 0.05f);
 
 	// Use this for initialization
 	void Start () {
-		cubeCreationRunning = true;
+		cubeCreationRunning = false;
 
 		cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		cube.transform.position = new Vector3(1, 1, 1);
@@ -51,8 +51,13 @@ public class CubeFactory : MonoBehaviour {
 		cubeCreationRunning = true;
 
 		cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		cube.transform.position = (_pinchDetectorL.Position + _pinchDetectorR.Position) / 2.0f;
-	}
+		cube.transform.position = (_pinchDetectorL.Position + _pinchDetectorR.Position) / 2f;
+        distance = Vector3.Distance(_pinchDetectorL.Position, _pinchDetectorR.Position); 
+
+        cube.transform.localScale = new Vector3(distance/2f, distance/2f, distance/2f);
+
+        Debug.Log("StartCubeCreation - cube scale: " + cube.transform.localScale);
+    }
 
 	public void EndCubeCreation() {
 		cubeCreationRunning = false;
@@ -66,7 +71,10 @@ public class CubeFactory : MonoBehaviour {
 			float newDistance = Vector3.Distance (_pinchDetectorL.Position, _pinchDetectorR.Position);
 			float deltaDistance = (newDistance - distance) * scaleFactor;
 
-			if (deltaDistance > accuracy_threshold
+            //Debug.Log("newDistance: " + newDistance + ", distance: " + distance + ", deltaDistance: " + deltaDistance);
+
+
+            if (deltaDistance > accuracy_threshold
 				&& cube.transform.localScale.x < maxScaleSize.x
 				&& cube.transform.localScale.y < maxScaleSize.y
 				&& cube.transform.localScale.z < maxScaleSize.z) {
