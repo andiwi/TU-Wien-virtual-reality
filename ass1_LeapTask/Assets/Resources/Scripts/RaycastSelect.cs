@@ -49,9 +49,12 @@ public class RaycastSelect : MonoBehaviour
         }
         else
         {
+            resetSelectedObjectColor();
             lineRenderer.enabled = false;
         }
     }
+
+
 
     private void collisionCheck()
     {    
@@ -69,11 +72,7 @@ public class RaycastSelect : MonoBehaviour
             {
                 if (selectedObject != pickupObject.gameObject)
                 {
-                    if (selectedObject != null)
-                    {
-                        //reset color of old selected object
-                        selectedObject.GetComponent<Renderer>().material.color = Color.white;
-                    }
+                    resetSelectedObjectColor();
 
                     //new selectedObject
                     selectedObject = pickupObject.gameObject;
@@ -86,6 +85,7 @@ public class RaycastSelect : MonoBehaviour
             }
             else
             {
+                resetSelectedObjectColor();
                 Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.red);
                 drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
             }
@@ -93,16 +93,22 @@ public class RaycastSelect : MonoBehaviour
         }
         else
         {
-            if (selectedObject != null)
-            {
-                //reset color of old selected object
-                selectedObject.GetComponent<Renderer>().material.color = Color.white;
-            }
-
+            resetSelectedObjectColor();
             Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.red);
             drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
 
             selectedObject = null;
+        }
+    }
+
+    /**
+     *  resets color of old selected object (if not null)
+     */
+    private void resetSelectedObjectColor()
+    {
+        if (selectedObject != null)
+        {        
+            selectedObject.GetComponent<Renderer>().material.color = Color.white;
         }
     }
 

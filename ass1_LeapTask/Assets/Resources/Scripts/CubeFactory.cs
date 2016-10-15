@@ -28,7 +28,10 @@ public class CubeFactory : MonoBehaviour {
 			_pinchDetectorR = value;
 		}
 	}
- 
+
+    [Tooltip("Specify the cube prefab to be produced")]
+    public GameObject cubePrefab;
+
     private GameObject cube;
 
 	private bool cubeCreationRunning = false;
@@ -42,12 +45,13 @@ public class CubeFactory : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		cubeCreationRunning = false;
+
 	}
 
 	public void StartCubeCreation() {
 		cubeCreationRunning = true;
 
-		cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube = Instantiate(cubePrefab);
 		cube.transform.position = (_pinchDetectorL.Position + _pinchDetectorR.Position) / 2f;
         distance = Vector3.Distance(_pinchDetectorL.Position, _pinchDetectorR.Position); 
 
