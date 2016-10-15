@@ -62,8 +62,12 @@ public class CubeFactory : MonoBehaviour {
 
 	public void EndCubeCreation() {
 		cubeCreationRunning = false;
-		cube.AddComponent<Rigidbody>();
-	}
+		Rigidbody rigid = cube.AddComponent<Rigidbody>();
+        rigid.interpolation = RigidbodyInterpolation.Interpolate;
+
+        Leap.Unity.Interaction.InteractionBehaviour behave = cube.AddComponent<Leap.Unity.Interaction.InteractionBehaviour>();
+        behave.Manager = GameObject.FindWithTag("InteractionManager").GetComponent< Leap.Unity.Interaction.InteractionManager>();
+    }
 	
 	// Update is called once per frame
 	void Update () {

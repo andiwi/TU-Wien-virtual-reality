@@ -161,7 +161,7 @@ public class RaycastSelect : MonoBehaviour
     private void carry(GameObject foo)
     {
 
-        foo.transform.position = Camera.main.transform.position + Camera.main.transform.forward * Vector3.Distance(Camera.main.transform.position, foo.transform.position);
+        foo.transform.position = fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position);
 
         //foo.transform.parent = transform; //TODO maybe change back
         Debug.DrawRay(fingerPos, foo.transform.position, Color.yellow);
