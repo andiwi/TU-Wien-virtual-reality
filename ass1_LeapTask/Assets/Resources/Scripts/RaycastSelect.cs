@@ -14,10 +14,11 @@ public class RaycastSelect : MonoBehaviour
 
     private bool selecting = false;
     private bool carrying = false;
+    private bool palmShooting = false;
 
     private GameObject selectedObject;
-    private Vector3 fingerDir;
-    private Vector3 fingerPos;
+    private Vector3 shootingDir;
+    private Vector3 shootingStartPos;
     private Ray ray;
     private CapsuleHand capsuleHand;
 
@@ -38,9 +39,7 @@ public class RaycastSelect : MonoBehaviour
 
     void Update()
     {
-        Leap.Finger finger = capsuleHand.GetLeapHand().Fingers[1];
-        fingerDir = finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
-        fingerPos = finger.TipPosition.ToVector3();
+        determineShootingPositioning();
 
         if (carrying)
         {
@@ -54,14 +53,29 @@ public class RaycastSelect : MonoBehaviour
         {
             resetSelectedObjectColor();
             lineRenderer.enabled = false;
+            selectedObject = null;
         }
     }
 
+    private void determineShootingPositioning()
+    {
+        if (palmShooting)
+        {
+            shootingDir = capsuleHand.GetLeapHand().PalmNormal.Normalized.ToVector3();
+            shootingStartPos = capsuleHand.GetLeapHand().PalmPosition.ToVector3();
+        }
+        else
+        {
+            Leap.Finger finger = capsuleHand.GetLeapHand().Fingers[1];
+            shootingDir = finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+            shootingStartPos = finger.TipPosition.ToVector3();
+        }
+    }
 
     private void collisionCheck()
     {
-        ray.origin = fingerPos;
-        ray.direction = fingerDir;
+        ray.origin = shootingStartPos;
+        ray.direction = shootingDir;
 
         RaycastHit hit;
 
@@ -79,19 +93,19 @@ public class RaycastSelect : MonoBehaviour
                 }
 
                 selectedObject.GetComponent<Renderer>().material.color = Color.blue;
-                drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
+                drawLine(shootingStartPos, shootingStartPos + ray.direction * 10000, Color.blue);
             }
             else
             {
                 resetSelectedObjectColor();             
-                drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
+                drawLine(shootingStartPos, shootingStartPos + ray.direction * 10000, Color.red);
             }
 
         }
         else
         {
             resetSelectedObjectColor();
-            drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
+            drawLine(shootingStartPos, shootingStartPos + ray.direction * 10000, Color.red);
 
             selectedObject = null;
         }
@@ -143,6 +157,19 @@ public class RaycastSelect : MonoBehaviour
         }
     }
 
+    public void StartPalmShooting()
+    {
+        //Debug.Log("StartPalmShooting");
+        palmShooting = true;
+    }
+
+    public void StopPalmShooting()
+    {
+        //Debug.Log("StopPalmShooting");
+        palmShooting = false;
+    }
+
+
     private void drawLine(Vector3 start, Vector3 end, Color color)
     {
         Debug.DrawRay(start, end, color);
@@ -156,7 +183,7 @@ public class RaycastSelect : MonoBehaviour
     private void carry(GameObject foo)
     {
         foo.transform.parent = transform;
-        drawLine(fingerPos, foo.transform.position, Color.yellow);
+        drawLine(shootingStartPos, foo.transform.position, Color.yellow);
     }
 
     private void OnDestroy()
