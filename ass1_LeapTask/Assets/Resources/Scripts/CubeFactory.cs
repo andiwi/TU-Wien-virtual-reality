@@ -57,7 +57,7 @@ public class CubeFactory : MonoBehaviour {
 
         cube.transform.localScale = new Vector3(distance/2f, distance/2f, distance/2f);
 
-        Debug.Log("StartCubeCreation - cube scale: " + cube.transform.localScale);
+        //Debug.Log("StartCubeCreation - cube scale: " + cube.transform.localScale);
     }
 
 	public void EndCubeCreation() {

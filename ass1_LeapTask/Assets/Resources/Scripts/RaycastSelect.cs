@@ -17,6 +17,8 @@ public class RaycastSelect : MonoBehaviour
     private Ray ray;
     private CapsuleHand capsuleHand;
 
+    public float smoothing = 1.0f;
+
     void Start()
     {
         ray = new Ray();
@@ -73,13 +75,12 @@ public class RaycastSelect : MonoBehaviour
                 if (selectedObject != pickupObject.gameObject)
                 {
                     resetSelectedObjectColor();
-
                     //new selectedObject
                     selectedObject = pickupObject.gameObject;
-                    selectedObject.GetComponent<Renderer>().material.color = Color.blue;
-
                 }
 
+
+                selectedObject.GetComponent<Renderer>().material.color = Color.blue;
                 Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
                 drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
             }
@@ -145,7 +146,7 @@ public class RaycastSelect : MonoBehaviour
             carrying = false;
             selectedObject.GetComponent<Rigidbody>().isKinematic = false;
             selectedObject.gameObject.GetComponent<Renderer>().material.color = Color.white;
-            //selectedObject.transform.parent = null;
+            selectedObject.transform.parent = null;
         }
     }
 
@@ -161,9 +162,13 @@ public class RaycastSelect : MonoBehaviour
     private void carry(GameObject foo)
     {
 
-        foo.transform.position = fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position);
+        //too much jittering
+        //foo.transform.position = fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position);
+        //foo.transform.position = Vector3.Lerp(foo.transform.position, fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position), smoothing);
+ 
+        // transform.position = Vector3.Lerp(transform.position, targetCamPos, smoothing);
 
-        //foo.transform.parent = transform; //TODO maybe change back
+        foo.transform.parent = transform; 
         Debug.DrawRay(fingerPos, foo.transform.position, Color.yellow);
         drawLine(fingerPos, foo.transform.position, Color.yellow);
     }
