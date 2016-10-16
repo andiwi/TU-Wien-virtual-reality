@@ -2,6 +2,10 @@
 using System.Collections;
 using Leap.Unity;
 
+/** 
+ * Script providing object selection and carrying via raycast collision check
+ * - has to be added to the gameObject containting a capsuleHand
+ */
 public class RaycastSelect : MonoBehaviour
 {
 
@@ -17,7 +21,6 @@ public class RaycastSelect : MonoBehaviour
     private Ray ray;
     private CapsuleHand capsuleHand;
 
-    public float smoothing = 1.0f;
 
     void Start()
     {
@@ -36,10 +39,9 @@ public class RaycastSelect : MonoBehaviour
 
     void Update()
     {
-        Leap.Finger finger = capsuleHand.GetLeapHand().Fingers[1]; 
+        Leap.Finger finger = capsuleHand.GetLeapHand().Fingers[1];
         fingerDir = finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
         fingerPos = finger.TipPosition.ToVector3();
-
 
         if (carrying)
         {
@@ -57,15 +59,13 @@ public class RaycastSelect : MonoBehaviour
     }
 
 
-
     private void collisionCheck()
-    {    
+    {
         ray.origin = fingerPos;
         ray.direction = fingerDir;
 
-
         RaycastHit hit;
-        //    if (Physics.Raycast(ray, out hit,Camera.main.farClipPlane, LayerMask.NameToLayer("Moveable")))
+
         if (Physics.Raycast(ray, out hit))
         {
             Moveable pickupObject = hit.collider.GetComponent<Moveable>();
@@ -78,7 +78,6 @@ public class RaycastSelect : MonoBehaviour
                     //new selectedObject
                     selectedObject = pickupObject.gameObject;
                 }
-
 
                 selectedObject.GetComponent<Renderer>().material.color = Color.blue;
                 Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
@@ -108,47 +107,12 @@ public class RaycastSelect : MonoBehaviour
     private void resetSelectedObjectColor()
     {
         if (selectedObject != null)
-        {        
+        {
             selectedObject.GetComponent<Renderer>().material.color = Color.white;
         }
     }
 
-    public void StartSelecting()
-    {
-        selecting = true;
-    }
 
-    public void StopSelecting()
-    {
-        selecting = false;
-    }
-
-    public void StartCarrying()
-    {
-        Debug.Log("StartCarrying()");
-        if (selectedObject != null)
-        {
-            Debug.Log("StartCarrying selectedObject ");
-            carrying = true;
-            selectedObject.GetComponent<Rigidbody>().isKinematic = true;
-            selectedObject.GetComponent<Renderer>().material.color = Color.yellow;
-
-        }
-
-    }
-
-    public void StopCarrying()
-    {
-        Debug.Log("StopCarrying()");
-        if (selectedObject != null)
-        {
-            Debug.Log("StopCarrying selectedObject ");
-            carrying = false;
-            selectedObject.GetComponent<Rigidbody>().isKinematic = false;
-            selectedObject.gameObject.GetComponent<Renderer>().material.color = Color.white;
-            selectedObject.transform.parent = null;
-        }
-    }
 
     private void drawLine(Vector3 start, Vector3 end, Color color)
     {
@@ -161,14 +125,7 @@ public class RaycastSelect : MonoBehaviour
 
     private void carry(GameObject foo)
     {
-
-        //too much jittering
-        //foo.transform.position = fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position);
-        //foo.transform.position = Vector3.Lerp(foo.transform.position, fingerPos + fingerDir * Vector3.Distance(fingerPos, foo.transform.position), smoothing);
- 
-        // transform.position = Vector3.Lerp(transform.position, targetCamPos, smoothing);
-
-        foo.transform.parent = transform; 
+        foo.transform.parent = transform;
         Debug.DrawRay(fingerPos, foo.transform.position, Color.yellow);
         drawLine(fingerPos, foo.transform.position, Color.yellow);
     }

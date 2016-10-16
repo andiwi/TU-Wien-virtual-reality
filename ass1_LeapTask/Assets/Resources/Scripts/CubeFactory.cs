@@ -4,8 +4,11 @@ using Leap.Unity;
 
 public class CubeFactory : MonoBehaviour {
 
-	public float scaleFactor; //recommended: between 0 and 1
-	public float accuracy_threshold; //only distance changes higher than this threshold will result in cube size changes.
+    [Tooltip("Scale factor for the scaling - recommended: between 0 and 1")]
+    public float scaleFactor;
+
+    [Tooltip("only distance changes higher than this threshold will result in cube size changes.")]
+    public float accuracy_threshold;
 
 	[SerializeField]
 	private PinchDetector _pinchDetectorL;
@@ -29,18 +32,15 @@ public class CubeFactory : MonoBehaviour {
 		}
 	}
 
-    [Tooltip("Specify the cube prefab to be produced")]
+    [Tooltip("Specify the (e.g. cube) prefab to be produced")]
     public GameObject cubePrefab;
 
-    private GameObject cube;
-
-	private bool cubeCreationRunning = false;
-    //private bool lposSet = false;
-    //private bool rposSet = false;
-
-    private float distance;
-	public Vector3 maxScaleSize = new Vector3(5,5,5);
+    public Vector3 maxScaleSize = new Vector3(5, 5, 5);
     public Vector3 minScaleSize = new Vector3(0.05f, 0.05f, 0.05f);
+
+    private GameObject cube;
+	private bool cubeCreationRunning = false;
+    private float distance;
 
 	// Use this for initialization
 	void Start () {
@@ -78,7 +78,6 @@ public class CubeFactory : MonoBehaviour {
 
             //Debug.Log("newDistance: " + newDistance + ", distance: " + distance + ", deltaDistance: " + deltaDistance);
 
-
             if (deltaDistance > accuracy_threshold
 				&& cube.transform.localScale.x < maxScaleSize.x
 				&& cube.transform.localScale.y < maxScaleSize.y
@@ -93,57 +92,6 @@ public class CubeFactory : MonoBehaviour {
 				distance = newDistance;
 			}
 			
-
-			/*
-			//
-			//here starts update with mouse
-			//
-			if (Input.GetKeyDown ("q")) {
-				cubeCreationRunning = false;
-				cube.AddComponent<Rigidbody>();
-				//cube.GetComponent<Rigidbody> ().useGravity = true;
-			}
-						 
-			Vector3 lpos = new Vector3();
-			Vector3 rpos = new Vector3();
-
-			//left click
-			if (Input.GetMouseButtonDown (0)) {
-				lposSet = true;
-				lpos = Input.mousePosition;
-			}
-			//right click
-			if (Input.GetMouseButtonDown (1)) {
-				rposSet = true;
-				rpos = Input.mousePosition;
-			}
-
-
-			if (lposSet == true && rposSet == true) {
-				float newDistance = Vector3.Distance (lpos, rpos);
-
-				float deltaDistance = (newDistance - distance) * scaleFactor;
-				Debug.Log (deltaDistance);
-
-				if (deltaDistance > accuracy_threshold
-					&& cube.transform.localScale.x < maxScaleSize.x
-					&& cube.transform.localScale.y < maxScaleSize.y
-					&& cube.transform.localScale.z < maxScaleSize.z) {
-						cube.transform.localScale += (Vector3.one * deltaDistance);
-						distance = newDistance;
-				} else if (deltaDistance < -accuracy_threshold
-					&& cube.transform.localScale.x > minScaleSize.x
-					&& cube.transform.localScale.y > minScaleSize.y
-					&& cube.transform.localScale.z > minScaleSize.z) {
-						cube.transform.localScale += (Vector3.one * deltaDistance);
-						distance = newDistance;
-				}
-
-				lposSet = false;
-				rposSet = false;
-			}
-			*/
-
 		}
 	}
 }
