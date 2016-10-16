@@ -10,7 +10,7 @@ public class RaycastSelect : MonoBehaviour
 {
 
     [Tooltip("Specify a new line renderer - optional")]
-    public LineRenderer lineRenderer;
+    public LineRenderer lineRenderer = null;
 
     private bool selecting = false;
     private bool carrying = false;
@@ -20,7 +20,6 @@ public class RaycastSelect : MonoBehaviour
     private Vector3 fingerPos;
     private Ray ray;
     private CapsuleHand capsuleHand;
-
 
     void Start()
     {
@@ -80,13 +79,11 @@ public class RaycastSelect : MonoBehaviour
                 }
 
                 selectedObject.GetComponent<Renderer>().material.color = Color.blue;
-                Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
                 drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.blue);
             }
             else
             {
-                resetSelectedObjectColor();
-                Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.red);
+                resetSelectedObjectColor();             
                 drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
             }
 
@@ -94,7 +91,6 @@ public class RaycastSelect : MonoBehaviour
         else
         {
             resetSelectedObjectColor();
-            Debug.DrawRay(fingerPos, fingerPos + ray.direction * 10000, Color.red);
             drawLine(fingerPos, fingerPos + ray.direction * 10000, Color.red);
 
             selectedObject = null;
@@ -112,10 +108,44 @@ public class RaycastSelect : MonoBehaviour
         }
     }
 
+    public void StartSelecting()
+    {
+        selecting = true;
+    }
 
+    public void StopSelecting()
+    {
+        selecting = false;
+    }
+
+    public void StartCarrying()
+    {
+        if (selectedObject != null)
+        {
+            Debug.Log("StartCarrying selectedObject ");
+            carrying = true;
+            selectedObject.GetComponent<Rigidbody>().isKinematic = true;
+            selectedObject.GetComponent<Renderer>().material.color = Color.yellow;
+
+        }
+
+    }
+
+    public void StopCarrying()
+    {
+        if (selectedObject != null)
+        {
+            Debug.Log("StopCarrying selectedObject ");
+            carrying = false;
+            selectedObject.GetComponent<Rigidbody>().isKinematic = false;
+            selectedObject.gameObject.GetComponent<Renderer>().material.color = Color.white;
+            selectedObject.transform.parent = null;
+        }
+    }
 
     private void drawLine(Vector3 start, Vector3 end, Color color)
     {
+        Debug.DrawRay(start, end, color);
         Vector3 offset = new Vector3(0, 0, 1);
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end + offset);
@@ -126,7 +156,11 @@ public class RaycastSelect : MonoBehaviour
     private void carry(GameObject foo)
     {
         foo.transform.parent = transform;
-        Debug.DrawRay(fingerPos, foo.transform.position, Color.yellow);
         drawLine(fingerPos, foo.transform.position, Color.yellow);
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(lineRenderer.material);
     }
 }
