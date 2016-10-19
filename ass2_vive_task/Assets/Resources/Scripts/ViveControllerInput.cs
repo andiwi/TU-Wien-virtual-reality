@@ -30,41 +30,75 @@ public class ViveControllerInput : MonoBehaviour
             Debug.Log("Pressed Trigger");
 
         }
+
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Grip))
+        {
+
+            GameObject sphere = GameObject.FindGameObjectWithTag("TestSphere");
+            sphere.transform.position = new Vector3(-1, 1, -0.3f);
+            sphere.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        }
     }
 
     void OnTriggerStay(Collider collider)
     {
-        Debug.Log("OnTriggerEnter - Collided with collider: " + collider.name);
-        if (!carrying && device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
-        {
-            Debug.Log("trigger Pushed");
 
-            //TODO pulse when grabbing cueStick
-            collider.attachedRigidbody.isKinematic = true;
-            collider.gameObject.transform.SetParent(gameObject.transform);
-            RumbleController(0.5f, 1f);
-            carrying = true;
-        }
-        else if (carrying && device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
         {
-            Debug.Log("dropping stick");
-            collider.attachedRigidbody.isKinematic = false;
-            collider.gameObject.transform.SetParent(null);
-            carrying = false;
+            Debug.Log("OnTriggerStay - Collided with collider: " + collider.name);
+            if (carrying)
+            {
+                Debug.Log("dropping stick");
+                collider.attachedRigidbody.isKinematic = false;
+                Cue cue = collider.gameObject.GetComponent<Cue>();
+
+                if (cue)
+                {
+                    //TODO set cue carrying null;
+                }
+                else
+                {
+
+                    collider.gameObject.transform.SetParent(null);
+                }
+
+                RumbleController(0.1f, 0.5f);
+                carrying = false;
+            }
+            else
+            {
+                collider.attachedRigidbody.isKinematic = true;
+                Cue cue = null; //TODO
+                //Cue cue = collider.gameObject.GetComponent<Cue>();
+
+                if (cue)
+                {
+                    //TODO set cue carrying ;
+                    //TODO rework - testing
+                    if (cue.frontDevice == null)
+                    {
+                        cue.AttachFrontDevice(device);
+                    } else if (cue.backDevice == null)
+                    {
+                        cue.AttackBackDevice(device);
+                    }
+                }
+                else
+                {
+                    collider.gameObject.transform.SetParent(gameObject.transform);
+                }
+
+                RumbleController(0.2f, 1f);
+                carrying = true;
+            }
         }
-        else
+        else if (!carrying)
         {
             //TODO vibrating! (touched but not grabbed)
-            LongVibration(2, 0.5f, 1f, 0.5f);
+            StartCoroutine(LongVibration(2, 0.5f, 1f, 0.5f));
         }
     }
-
-    private void removeCueStick()
-    {
-        //cue.transform.position = Vector3.zero;
-        //TODO short pulse
-    }
-
 
 
     void RumbleController(float duration, float strength)
