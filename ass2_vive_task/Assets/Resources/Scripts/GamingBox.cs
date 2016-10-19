@@ -7,9 +7,35 @@ public class GamingBox : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		GameObject box = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box.transform.localScale += new Vector3 (2, 2, 2);
-		box.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+		GameObject box1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box1.transform.localScale = new Vector3 (3, 3, 0.1f);
+		box1.transform.position = new Vector3(0, 0,-1.5f);
+		box1.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		GameObject box2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box2.transform.localScale = new Vector3 (3, 3, 0.1f);
+		box2.transform.position = new Vector3(0, 0, 1.5f);
+		box2.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		GameObject box3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box3.transform.localScale = new Vector3 (3, 0.1f, 3);
+		box3.transform.position = new Vector3(0, 1.5f, 0);
+		box3.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		GameObject box4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box4.transform.localScale = new Vector3 (3, 0.1f, 3);
+		box4.transform.position = new Vector3(0, -1.5f, 0);
+		box4.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		GameObject box5 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box5.transform.localScale = new Vector3 (0.1f, 3, 3);
+		box5.transform.position = new Vector3(-1.5f, 0, 0);
+		box5.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		GameObject box6 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		box6.transform.localScale = new Vector3 (0.1f, 3, 3);
+		box6.transform.position = new Vector3(1.5f, 0, 0);
+		box6.GetComponent<Renderer>().sharedMaterial = boxMaterial;
 
 		GameObject hole1 = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 		hole1.transform.position = new Vector3 (-1.5f, -1.5f, -1.5f);
