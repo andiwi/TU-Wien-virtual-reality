@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Balls : MonoBehaviour {
 
+	public Material ball0_material;
 	public Material ball1_material;
 	public Material ball2_material;
 	public Material ball3_material;
@@ -20,6 +21,11 @@ public class Balls : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		GameObject ball0 = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+		ball0.transform.localScale -= new Vector3 (0.5f, 0.5f, 0.5f);
+		ball0.transform.position = new Vector3 (0, 0.5f, 1.5f);
+		ball0.GetComponent<Renderer> ().sharedMaterial = ball0_material;
+
 		GameObject ball1 = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 		ball1.transform.localScale -= new Vector3 (0.5f, 0.5f, 0.5f);
 		ball1.transform.position = new Vector3 (-0.5f, 0, -0.5f);
