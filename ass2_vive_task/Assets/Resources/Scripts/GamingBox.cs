@@ -1,61 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GamingBox : MonoBehaviour {
 	public Material boxMaterial;
 	public Material holeMaterial;
 
+	private List<GameObject> walls = new List<GameObject>();
+	private List<GameObject> holes = new List<GameObject>();
+
 	// Use this for initialization
 	void Start () {
-		GameObject box1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box1.transform.localScale = new Vector3 (7, 7, 0.1f);
-		box1.transform.position = new Vector3(0, 0,-3.5f);
-		box1.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb = box1.AddComponent<Rigidbody>();
-		rb.constraints = RigidbodyConstraints.FreezeAll;
-		box1.AddComponent<BoxCollision> ();
 
-		GameObject box2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box2.transform.localScale = new Vector3 (7, 7, 0.1f);
-		box2.transform.position = new Vector3(0, 0, 3.5f);
-		box2.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb2 = box2.AddComponent<Rigidbody>();
-		rb2.constraints = RigidbodyConstraints.FreezeAll;
-		box2.AddComponent<BoxCollision> ();
+		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, -3.5f), "wall_front"));
+		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, 3.5f), "wall_back"));
+		walls.Add (createWall (new Vector3 (7, 0.1f, 7), new Vector3 (0, 3.5f, 0), "wall_top"));
+		walls.Add (createWall (new Vector3 (7, 0.1f, 7), new Vector3 (0, -3.5f, 0), "wall_bottom"));
+		walls.Add (createWall (new Vector3 (0.1f, 7, 7), new Vector3 (-3.5f, 0, 0), "wall_left"));
+		walls.Add (createWall (new Vector3 (0.1f, 7, 7), new Vector3 (3.5f, 0, 0), "wall_right"));
 
-		GameObject box3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box3.transform.localScale = new Vector3 (7, 0.1f, 7);
-		box3.transform.position = new Vector3(0, 3.5f, 0);
-		box3.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb3 = box3.AddComponent<Rigidbody>();
-		rb3.constraints = RigidbodyConstraints.FreezeAll;
-		box3.AddComponent<BoxCollision> ();
-
-		GameObject box4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box4.transform.localScale = new Vector3 (7, 0.1f, 7);
-		box4.transform.position = new Vector3(0, -3.5f, 0);
-		box4.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb4 = box4.AddComponent<Rigidbody>();
-		rb4.constraints = RigidbodyConstraints.FreezeAll;
-		box4.AddComponent<BoxCollision> ();
-
-		GameObject box5 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box5.transform.localScale = new Vector3 (0.1f, 7, 7);
-		box5.transform.position = new Vector3(-3.5f, 0, 0);
-		box5.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb5 = box5.AddComponent<Rigidbody>();
-		rb5.constraints = RigidbodyConstraints.FreezeAll;
-		box5.AddComponent<BoxCollision> ();
-
-		GameObject box6 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		box6.transform.localScale = new Vector3 (0.1f, 7, 7);
-		box6.transform.position = new Vector3(3.5f, 0, 0);
-		box6.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-		Rigidbody rb6 = box6.AddComponent<Rigidbody>();
-		rb6.constraints = RigidbodyConstraints.FreezeAll;
-		box6.AddComponent<BoxCollision> ();
+		holes.Add(createHole(new Vector3(-3.5f, -3.5f, -3.5f), "wall_left_front_bottom"));
+		holes.Add(createHole(new Vector3(-3.5f, -3.5f, 3.5f), "wall_left_back_bottom"));
+		holes.Add(createHole(new Vector3(-3.5f, 3.5f, -3.5f), "wall_left_front_top"));
+		holes.Add(createHole(new Vector3(-3.5f, 3.5f, 3.5f), "wall_left_back_top"));
+		holes.Add(createHole(new Vector3(3.5f, -3.5f, -3.5f), "wall_right_front_bottom"));
+		holes.Add(createHole(new Vector3(3.5f, -3.5f, 3.5f), "wall_right_back_bottom"));
+		holes.Add(createHole(new Vector3(3.5f, 3.5f, -3.5f), "wall_right_front_top"));
+		holes.Add(createHole(new Vector3(3.5f, 3.5f, 3.5f), "wall_right_back_bottom"));
 
 		//holes
+		/*
 		GameObject hole1 = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 		hole1.transform.position = new Vector3 (-3.5f, -3.5f, -3.5f);
 		hole1.GetComponent<Renderer>().sharedMaterial = holeMaterial;
@@ -158,11 +132,36 @@ public class GamingBox : MonoBehaviour {
 		Physics.IgnoreCollision (box2.GetComponent<Collider> (), hole8.GetComponent<Collider> ());
 		Physics.IgnoreCollision (box3.GetComponent<Collider> (), hole8.GetComponent<Collider> ());
 		Physics.IgnoreCollision (box6.GetComponent<Collider> (), hole8.GetComponent<Collider> ());
-
+		*/
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	private GameObject createWall(Vector3 scale, Vector3 position, string name) {
+		GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		wall.transform.localScale = scale;
+		wall.transform.position = position;
+		wall.name = name;
+		wall.transform.parent = GameObject.Find("GamingBox").transform;
+		wall.GetComponent<Renderer>().sharedMaterial = boxMaterial;
+
+		Rigidbody rb = wall.AddComponent<Rigidbody>();
+		rb.constraints = RigidbodyConstraints.FreezeAll;
+		wall.AddComponent<BoxCollision> ();
+
+		return wall;
+	}
+
+	private GameObject createHole(Vector3 position, string name) {
+		GameObject hole = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+		hole.transform.position = position;
+		hole.name = name;
+		hole.transform.parent = GameObject.Find("GamingBox").transform;
+		hole.GetComponent<Renderer>().sharedMaterial = holeMaterial;
+
+		return hole;
 	}
 }
