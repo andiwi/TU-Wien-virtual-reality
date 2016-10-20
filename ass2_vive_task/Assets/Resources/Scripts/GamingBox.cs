@@ -3,15 +3,41 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GamingBox : MonoBehaviour {
-	public Material boxMaterial;
-	public Material holeMaterial;
+	public Material wall_material;
+	public PhysicMaterial wall_collider_material;
+	public Material hole_material;
 
-	private List<GameObject> walls = new List<GameObject>();
-	private List<GameObject> holes = new List<GameObject>();
+	//private List<GameObject> walls = new List<GameObject>();
+	//private List<GameObject> holes = new List<GameObject>();
+
+	private GameObject walls;
+	private GameObject holes;
 
 	// Use this for initialization
 	void Start () {
+		walls = new GameObject ("walls");
+		holes = new GameObject ("holes");
 
+		walls.transform.parent = GameObject.Find("GamingBox").transform;
+		holes.transform.parent = GameObject.Find("GamingBox").transform;
+
+		createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, -3.5f), "wall_front");
+		createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, 3.5f), "wall_back");
+		createWall (new Vector3 (7, 0.1f, 7), new Vector3 (0, 3.5f, 0), "wall_top");
+		createWall (new Vector3 (7, 0.1f, 7), new Vector3 (0, -3.5f, 0), "wall_bottom");
+		createWall (new Vector3 (0.1f, 7, 7), new Vector3 (-3.5f, 0, 0), "wall_left");
+		createWall (new Vector3 (0.1f, 7, 7), new Vector3 (3.5f, 0, 0), "wall_right");
+
+		createHole(new Vector3(-3.5f, -3.5f, -3.5f), "hole_left_front_bottom");
+		createHole(new Vector3(-3.5f, -3.5f, 3.5f), "hole_left_back_bottom");
+		createHole(new Vector3(-3.5f, 3.5f, -3.5f), "hole_left_front_top");
+		createHole(new Vector3(-3.5f, 3.5f, 3.5f), "hole_left_back_top");
+		createHole(new Vector3(3.5f, -3.5f, -3.5f), "hole_right_front_bottom");
+		createHole(new Vector3(3.5f, -3.5f, 3.5f), "hole_right_back_bottom");
+		createHole(new Vector3(3.5f, 3.5f, -3.5f), "hole_right_front_top");
+		createHole(new Vector3(3.5f, 3.5f, 3.5f), "hole_right_back_bottom");
+
+		/*
 		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, -3.5f), "wall_front"));
 		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, 3.5f), "wall_back"));
 		walls.Add (createWall (new Vector3 (7, 0.1f, 7), new Vector3 (0, 3.5f, 0), "wall_top"));
@@ -19,14 +45,15 @@ public class GamingBox : MonoBehaviour {
 		walls.Add (createWall (new Vector3 (0.1f, 7, 7), new Vector3 (-3.5f, 0, 0), "wall_left"));
 		walls.Add (createWall (new Vector3 (0.1f, 7, 7), new Vector3 (3.5f, 0, 0), "wall_right"));
 
-		holes.Add(createHole(new Vector3(-3.5f, -3.5f, -3.5f), "wall_left_front_bottom"));
-		holes.Add(createHole(new Vector3(-3.5f, -3.5f, 3.5f), "wall_left_back_bottom"));
-		holes.Add(createHole(new Vector3(-3.5f, 3.5f, -3.5f), "wall_left_front_top"));
-		holes.Add(createHole(new Vector3(-3.5f, 3.5f, 3.5f), "wall_left_back_top"));
-		holes.Add(createHole(new Vector3(3.5f, -3.5f, -3.5f), "wall_right_front_bottom"));
-		holes.Add(createHole(new Vector3(3.5f, -3.5f, 3.5f), "wall_right_back_bottom"));
-		holes.Add(createHole(new Vector3(3.5f, 3.5f, -3.5f), "wall_right_front_top"));
-		holes.Add(createHole(new Vector3(3.5f, 3.5f, 3.5f), "wall_right_back_bottom"));
+		holes.Add(createHole(new Vector3(-3.5f, -3.5f, -3.5f), "hole_left_front_bottom"));
+		holes.Add(createHole(new Vector3(-3.5f, -3.5f, 3.5f), "hole_left_back_bottom"));
+		holes.Add(createHole(new Vector3(-3.5f, 3.5f, -3.5f), "hole_left_front_top"));
+		holes.Add(createHole(new Vector3(-3.5f, 3.5f, 3.5f), "hole_left_back_top"));
+		holes.Add(createHole(new Vector3(3.5f, -3.5f, -3.5f), "hole_right_front_bottom"));
+		holes.Add(createHole(new Vector3(3.5f, -3.5f, 3.5f), "hole_right_back_bottom"));
+		holes.Add(createHole(new Vector3(3.5f, 3.5f, -3.5f), "hole_right_front_top"));
+		holes.Add(createHole(new Vector3(3.5f, 3.5f, 3.5f), "hole_right_back_bottom"));
+		*/
 
 		//holes
 		/*
@@ -145,12 +172,10 @@ public class GamingBox : MonoBehaviour {
 		wall.transform.localScale = scale;
 		wall.transform.position = position;
 		wall.name = name;
-		wall.transform.parent = GameObject.Find("GamingBox").transform;
-		wall.GetComponent<Renderer>().sharedMaterial = boxMaterial;
-
-		Rigidbody rb = wall.AddComponent<Rigidbody>();
-		rb.constraints = RigidbodyConstraints.FreezeAll;
-		wall.AddComponent<BoxCollision> ();
+		//wall.transform.parent = GameObject.Find("GamingBox").transform;
+		wall.transform.parent = walls.transform;
+		wall.GetComponent<Renderer>().sharedMaterial = wall_material;
+		wall.GetComponent<Collider>().material = wall_collider_material;
 
 		return wall;
 	}
@@ -159,8 +184,14 @@ public class GamingBox : MonoBehaviour {
 		GameObject hole = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 		hole.transform.position = position;
 		hole.name = name;
-		hole.transform.parent = GameObject.Find("GamingBox").transform;
-		hole.GetComponent<Renderer>().sharedMaterial = holeMaterial;
+		hole.transform.parent = holes.transform;
+		hole.GetComponent<Renderer>().sharedMaterial = hole_material;
+
+		SphereCollider collider = hole.GetComponent<SphereCollider> ();
+		collider.radius = 0.4f;
+		collider.isTrigger = true;
+
+		hole.AddComponent<HoleTrigger> ();
 
 		return hole;
 	}

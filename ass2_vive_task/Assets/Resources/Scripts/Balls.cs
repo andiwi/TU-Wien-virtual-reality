@@ -20,6 +20,8 @@ public class Balls : MonoBehaviour {
 	public Material ball13_material;
 	public Material ball14_material;
 
+	public PhysicMaterial ball_collider_material;
+
 	private GameObject cue_ball;
 	private List<GameObject> balls = new List<GameObject>();
 
@@ -43,7 +45,7 @@ public class Balls : MonoBehaviour {
 		balls.Add(this.createBall(new Vector3 (0.25f, 0.38f, 0.25f), ball13_material, "ball13"));
 		balls.Add(this.createBall(new Vector3 (0, 0.76f, 0), ball14_material, "ball14"));
 
-		//cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
+		cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
 
 	}
 	
@@ -60,8 +62,12 @@ public class Balls : MonoBehaviour {
 		ball.name = name;
 		ball.transform.parent = GameObject.Find("Balls").transform;
 		ball.GetComponent<Renderer> ().sharedMaterial = material;
-		Rigidbody rb12 = ball.AddComponent<Rigidbody>();
-		rb12.useGravity = false;
+		ball.GetComponent<Collider>().material = ball_collider_material;
+
+		Rigidbody rb = ball.AddComponent<Rigidbody>();
+		rb.drag = 0.7f;
+		rb.angularDrag = 0.5f;
+		rb.useGravity = false;
 
 		return ball;
 	}
