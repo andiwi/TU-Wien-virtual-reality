@@ -4,14 +4,15 @@ using System.Collections;
 public class HoleTrigger : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other) {
-		Debug.Log ("Object entered the trigger.");
+		other.isTrigger = true;
 	}
 
 	void OnTriggerStay (Collider other) {
-		Debug.Log ("Object is within the trigger.");
+		//Debug.Log ("Object is within the trigger.");
 	}
 
 	void OnTriggerExit (Collider other) {
-		Debug.Log ("Object exited the trigger.");
+		other.isTrigger = false; //so that ball cannot fall back in box
+		other.attachedRigidbody.useGravity = true;
 	}
 }
