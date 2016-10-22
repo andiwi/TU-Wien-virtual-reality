@@ -150,11 +150,47 @@ public class Cue : MonoBehaviour, IViveControlControllable
         if (hasTwoControllersAttached())
         {
             transform.parent = null;
-            Vector3 dir = getFrontController().device.transform.pos - getBackController().device.transform.pos;
-            Vector3 mid = dir / 2.0f + getBackController().device.transform.pos;
+            //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos).normalized; 
+            //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos);
+            Vector3 dir = getFrontController().controllerTransform.position - getBackController().controllerTransform.position;
+
+            //Debug.Log("changePos: frontPos: " + getFrontController().device.transform.pos + ", backPos: " + getBackController().device.transform.pos + ", dir: " + dir);
+            Debug.Log("changePos: frontPos: " + getFrontController().controllerTransform.position + ", backPos: " + getBackController().controllerTransform.position + ", dir: " + dir);
+
+            //Quaternion rotation = Quaternion.LookRotation(dir);
+
+
+
+            //float rotationSpeed = 1f; //test
+
+            //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+
+
+            //test1: 
+            //Vector3 testBack = getBackController().device.transform.pos - transform.position;
+            //Vector3 testFront = getFrontController().device.transform.pos - transform.position;
+            //transform.position = transform.position + testBack + testFront;
+            //Debug.Log("testBackVec: " + testBack + ", testFrontVec: " + testFront + ", new posVecotr: " + transform.position);
+
+            //test2:
+            //Vector3 mid = dir / 2.0f + getBackController().device.transform.pos;        
+            //transform.position = mid + transform.position;
+
+            Vector3 mid = dir / 2.0f + getBackController().controllerTransform.position;
+            Debug.Log("new mid: " + mid);
+            transform.position = mid;
+
 
             //transform.position = mid;
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            //transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+
+            //transform.SetParent(getBackController().controllerTransform);
+
+            //foo.transform.position = mainCamera.transform.position + mainCamera.transform.forward * Vector3.Distance(mainCamera.transform.position, foo.transform.position);
+
+
+
         }
         else if (hasOneControllerAttached())
         {
