@@ -68,6 +68,7 @@ public class ViveControllerControl : MonoBehaviour
                     //collider.attachedRigidbody.isKinematic = true;
                     RumbleController(0.2f, 1f);
                     carrying = true;
+                    StartCoroutine(idlePulseEnumerator);
                 }
             }
             else
