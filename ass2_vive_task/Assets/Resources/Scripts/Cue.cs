@@ -19,20 +19,34 @@ public class Cue : MonoBehaviour
      * sorted list of the controllers - sorted by the distance to the tip 
      * used to easily determine front and back device
      * */
-    System.Collections.Generic.SortedList<float, SteamVR_Controller.Device> controllers;
+    System.Collections.Generic.SortedList<float, Controller> controllers;
 
     bool twoControllerMode = false;
 
-
-    public void AttachDevice(SteamVR_Controller.Device device)
+    private class Controller
     {
-        Vector3 tipPos = new Vector3(0, transform.localScale.y) + transform.position;
+        public SteamVR_Controller.Device device;
+        public Transform controllerTransform;
 
-        if (!controllers.ContainsValue(device))
+        public Controller(SteamVR_Controller.Device device, Transform controllerTransform)
         {
+            this.device = device;
+            this.controllerTransform = controllerTransform;
+        }
+    }
+
+
+
+    public void AttachDevice(SteamVR_Controller.Device device, Transform parentableTransform)
+    {
+        if (!isDeviceAttached(device))
+        {
+            Vector3 tipPos = new Vector3(0, transform.localScale.y) + transform.position; //TODO optimize
+
             float distanceFromTip = (tipPos - device.transform.pos).magnitude;
-            Debug.Log("attaching device - distanceFromTip: " + distanceFromTip);
-            controllers.Add(distanceFromTip, device);
+            Controller newController = new Controller(device, parentableTransform);
+            controllers.Add(distanceFromTip, newController);
+            Debug.Log("attaching device - distanceFromTip: " + distanceFromTip + " , controllers size is now: " + controllers.Count);
         }
         else
         {
@@ -40,11 +54,35 @@ public class Cue : MonoBehaviour
         }
     }
 
+    private bool isDeviceAttached(SteamVR_Controller.Device device)
+    {
+        Controller foundController = getControllerByDevice(device);
+        return foundController != null;
+    }
+
+    private Controller getControllerByDevice(SteamVR_Controller.Device device)
+    {
+        foreach (System.Collections.Generic.KeyValuePair<float, Controller> curr in controllers)
+        {
+            if (curr.Value.device.Equals(device))
+            {
+                return curr.Value;
+            }
+        }
+
+        return null;
+    }
+
+
     public void DetachDevice(SteamVR_Controller.Device device)
     {
-        if (controllers.ContainsValue(device))
+
+        Controller foundController = getControllerByDevice(device);
+
+        if (foundController != null)
         {
-            controllers.Values.Remove(device);
+            controllers.RemoveAt(controllers.IndexOfValue(foundController));
+            //controllers.Values.Remove(device); //TODO work on removing..
 
             Debug.Log("removed device controllers size is now: " + controllers.Count);
         }
@@ -56,7 +94,7 @@ public class Cue : MonoBehaviour
 
     void Start()
     {
-        controllers = new System.Collections.Generic.SortedList<float, SteamVR_Controller.Device>();
+        controllers = new System.Collections.Generic.SortedList<float, Controller>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
         oldpos = transform.position;
     }
@@ -72,7 +110,7 @@ public class Cue : MonoBehaviour
         calcVelocity();
     }
 
-    private SteamVR_Controller.Device getBackDevice()
+    private Controller getBackController()
     {
         if (hasOneControllerAttached())
         {
@@ -84,12 +122,12 @@ public class Cue : MonoBehaviour
         }
         else
         {
-            Debug.Log("getBackDevice no device!");
+            Debug.Log("getBackController no device!");
             return null;
         }
     }
 
-    private SteamVR_Controller.Device getFrontDevice()
+    private Controller getFrontController()
     {
         if (hasTwoControllersAttached())
         {
@@ -97,7 +135,7 @@ public class Cue : MonoBehaviour
         }
         else
         {
-            Debug.Log("getFrontDevice no device!");
+            Debug.Log("getFrontController no device!");
             return null;
         }
     }
@@ -118,12 +156,20 @@ public class Cue : MonoBehaviour
 
         if (hasTwoControllersAttached())
         {
-            Vector3 dir = getFrontDevice().transform.pos - getBackDevice().transform.pos;
-            Vector3 mid = dir / 2.0f + getBackDevice().transform.pos;
+            transform.parent = null;
+            Vector3 dir = getFrontController().device.transform.pos - getBackController().device.transform.pos;
+            Vector3 mid = dir / 2.0f + getBackController().device.transform.pos;
 
             //transform.position = mid;
             transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
-        } 
+        }
+        else if (hasOneControllerAttached())
+        {
+            transform.SetParent(getBackController().controllerTransform);
+        } else
+        {
+            transform.parent = null;
+        }
 
 
     }

@@ -74,17 +74,7 @@ public class ViveControllerControl : MonoBehaviour
 
                 if (cue)
                 {
-                    //TODO set cue carrying ;
-                    //TODO rework - testing
-                    //if (cue.frontDevice == null)
-                    //{
-                    //    cue.AttachFrontDevice(device);
-                    //} else if (cue.backDevice == null)
-                    //{
-                    //    cue.AttackBackDevice(device);
-                    //}
-
-                    cue.AttachDevice(device);
+                    cue.AttachDevice(device, transform);
                 }
                 else
                 {
