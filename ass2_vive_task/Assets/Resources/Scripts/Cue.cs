@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Cue : MonoBehaviour
+public class Cue : MonoBehaviour, IViveControlControllable
 {
 
     Vector3 oldpos;
@@ -23,18 +23,25 @@ public class Cue : MonoBehaviour
 
     bool twoControllerMode = false;
 
-    private class Controller
-    {
-        public SteamVR_Controller.Device device;
-        public Transform controllerTransform;
 
-        public Controller(SteamVR_Controller.Device device, Transform controllerTransform)
-        {
-            this.device = device;
-            this.controllerTransform = controllerTransform;
-        }
+
+    void Start()
+    {
+        controllers = new System.Collections.Generic.SortedList<float, Controller>();
+        rigidBody = gameObject.GetComponent<Rigidbody>();
+        oldpos = transform.position;
     }
 
+
+    void Update()
+    {
+        changePosition();
+    }
+
+    void FixedUpdate()
+    {
+        calcVelocity();
+    }
 
 
     public void AttachDevice(SteamVR_Controller.Device device, Transform parentableTransform)
@@ -53,6 +60,26 @@ public class Cue : MonoBehaviour
             Debug.Log("Tried to attachDevice - but device is already attached");
         }
     }
+
+    public void DetachDevice(SteamVR_Controller.Device device)
+    {
+
+        Controller foundController = getControllerByDevice(device);
+
+        if (foundController != null)
+        {
+            controllers.RemoveAt(controllers.IndexOfValue(foundController));
+            //controllers.Values.Remove(device); //TODO work on removing..
+
+            Debug.Log("removed device controllers size is now: " + controllers.Count);
+        }
+        else
+        {
+            Debug.Log("Tried to detachDevice - but device not attached");
+        }
+    }
+
+
 
     private bool isDeviceAttached(SteamVR_Controller.Device device)
     {
@@ -74,41 +101,7 @@ public class Cue : MonoBehaviour
     }
 
 
-    public void DetachDevice(SteamVR_Controller.Device device)
-    {
 
-        Controller foundController = getControllerByDevice(device);
-
-        if (foundController != null)
-        {
-            controllers.RemoveAt(controllers.IndexOfValue(foundController));
-            //controllers.Values.Remove(device); //TODO work on removing..
-
-            Debug.Log("removed device controllers size is now: " + controllers.Count);
-        }
-        else
-        {
-            Debug.Log("Tried to detachDevice - but device not attached");
-        }
-    }
-
-    void Start()
-    {
-        controllers = new System.Collections.Generic.SortedList<float, Controller>();
-        rigidBody = gameObject.GetComponent<Rigidbody>();
-        oldpos = transform.position;
-    }
-
-
-    void Update()
-    {
-        changePosition();
-    }
-
-    void FixedUpdate()
-    {
-        calcVelocity();
-    }
 
     private Controller getBackController()
     {
@@ -166,7 +159,8 @@ public class Cue : MonoBehaviour
         else if (hasOneControllerAttached())
         {
             transform.SetParent(getBackController().controllerTransform);
-        } else
+        }
+        else
         {
             transform.parent = null;
         }
@@ -209,19 +203,15 @@ public class Cue : MonoBehaviour
         //rigidCollider.angularVelocity = rigidBody.angularVelocity;
     }
 
-    /*
-     *             rigidBody.velocity = device.velocity;
-            rigidBody.angularVelocity = device.angularVelocity;
+    private class Controller
+    {
+        public SteamVR_Controller.Device device;
+        public Transform controllerTransform;
 
-    */
-
-    /*
-     * 
-     *      public var explosionStrength : float = 10.0f;
-
-     function OnTriggerEnter (target_ : Collider)
-     {
-         var forceVec : Vector3 = -target_.rigidbody.velocity.normalized * explosionStrength;
-         target_.rigidbody.AddForce(forceVec,ForceMode.Acceleration);
-     }*/
+        public Controller(SteamVR_Controller.Device device, Transform controllerTransform)
+        {
+            this.device = device;
+            this.controllerTransform = controllerTransform;
+        }
+    }
 }

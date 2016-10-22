@@ -7,7 +7,11 @@ public class ViveControllerControl : MonoBehaviour
 
     SteamVR_TrackedObject trackedObj;
     SteamVR_Controller.Device device;
+
     bool carrying = false;
+    IViveControlControllable currentControllable;
+
+    private IEnumerator idlePulseEnumerator;
 
     void Awake()
     {
@@ -27,6 +31,9 @@ public class ViveControllerControl : MonoBehaviour
         {
             Debug.Log("Pressed Trigger");
 
+
+
+
         }
 
         if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Grip))
@@ -39,60 +46,55 @@ public class ViveControllerControl : MonoBehaviour
         }
     }
 
+
+
+
     void OnTriggerStay(Collider collider)
     {
 
         if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
         {
-            Debug.Log("OnTriggerStay - Collided with collider: " + collider.name);
-            if (carrying)
+            Debug.Log("OnTriggerStay - Touched down Trigger and collided with collider: " + collider.name);
+
+            if (!carrying)
             {
-                Debug.Log("dropping stick");
-                collider.attachedRigidbody.isKinematic = false;
-                Cue cue = collider.gameObject.GetComponent<Cue>();
+                //Debug.Log("Debug: devicePos is: " + device.transform.pos + " , thisTransform is: " + transform.position);
 
-                if (cue)
+                currentControllable = collider.gameObject.GetComponent<IViveControlControllable>();
+
+                if (currentControllable != null)
                 {
-                    //TODO set cue carrying null;
-                    cue.DetachDevice(device);
+                    currentControllable.AttachDevice(device, transform);
+                    //collider.attachedRigidbody.isKinematic = true;
+                    RumbleController(0.2f, 1f);
+                    carrying = true;
                 }
-                else
-                {
-                    //device.transform.
-
-                    collider.gameObject.transform.SetParent(null);
-                }
-
-                RumbleController(0.1f, 0.5f);
-                carrying = false;
             }
             else
             {
-                Debug.Log("Debug: devicePos is: " + device.transform.pos + " , thisTransform is: " + transform.position);
-                collider.attachedRigidbody.isKinematic = true;
-                Cue cue = collider.gameObject.GetComponent<Cue>();
-
-                if (cue)
-                {
-                    cue.AttachDevice(device, transform);
-                }
-                else
-                {
-                    //move any object entering the controller collider (FOR DEBUGGING)
-                    collider.gameObject.transform.SetParent(gameObject.transform);
-                }
-
-                RumbleController(0.2f, 1f);
-                carrying = true;
+                dropControllable();
             }
         }
     }
+
+    private void dropControllable()
+    {
+        Debug.Log("dropControllable() - dropping currentControllable: " + currentControllable);
+
+        if (currentControllable != null)
+        {
+            currentControllable.DetachDevice(device);
+            RumbleController(0.1f, 0.5f);
+            carrying = false;
+        }
+    }
+
 
     void OnTriggerEnter()
     {
         if (!carrying)
         {
-            idlePulseEnumerator = PulseVibration(10000, 0.5f, 0.5f, 0.5f);
+            idlePulseEnumerator = PulseVibration(10000, 0.2f, 0.5f, 0.1f);
             StartCoroutine(idlePulseEnumerator);
         }
 
@@ -110,7 +112,7 @@ public class ViveControllerControl : MonoBehaviour
         StartCoroutine(PulseVibration(duration, strength));
     }
 
-    private IEnumerator idlePulseEnumerator;
+
 
     IEnumerator PulseVibration(float duration, float strength)
     {
@@ -127,10 +129,12 @@ public class ViveControllerControl : MonoBehaviour
     }
 
 
-    //vibrationCount is how many vibrations
-    //vibrationLength is how long each vibration should go for
-    //gapLength is how long to wait between vibrations
-    //strength is vibration strength from 0-1
+    /**
+     * vibrationCount is how many vibrations
+     * vibrationLength is how long each vibration should go for
+     * gapLength is how long to wait between vibrations
+     * strength is vibration strength from 0-1
+     * */
     IEnumerator PulseVibration(int vibrationCount, float vibrationLength, float gapLength, float strength)
     {
         strength = Mathf.Clamp01(strength);
