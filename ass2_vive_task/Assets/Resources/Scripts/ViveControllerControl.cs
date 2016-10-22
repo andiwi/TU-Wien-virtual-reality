@@ -2,9 +2,8 @@
 using System.Collections;
 
 [RequireComponent(typeof(SteamVR_TrackedObject))]
-public class ViveControllerInput : MonoBehaviour
+public class ViveControllerControl : MonoBehaviour
 {
-
 
     SteamVR_TrackedObject trackedObj;
     SteamVR_Controller.Device device;
@@ -12,7 +11,6 @@ public class ViveControllerInput : MonoBehaviour
 
     void Awake()
     {
-
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
@@ -56,9 +54,11 @@ public class ViveControllerInput : MonoBehaviour
                 if (cue)
                 {
                     //TODO set cue carrying null;
+                    cue.DetachDevice(device);
                 }
                 else
                 {
+                    //device.transform.
 
                     collider.gameObject.transform.SetParent(null);
                 }
@@ -68,24 +68,27 @@ public class ViveControllerInput : MonoBehaviour
             }
             else
             {
+                Debug.Log("Debug: devicePos is: " + device.transform.pos + " , thisTransform is: " + transform.position);
                 collider.attachedRigidbody.isKinematic = true;
-                Cue cue = null; //TODO
-                //Cue cue = collider.gameObject.GetComponent<Cue>();
+                Cue cue = collider.gameObject.GetComponent<Cue>();
 
                 if (cue)
                 {
                     //TODO set cue carrying ;
                     //TODO rework - testing
-                    if (cue.frontDevice == null)
-                    {
-                        cue.AttachFrontDevice(device);
-                    } else if (cue.backDevice == null)
-                    {
-                        cue.AttackBackDevice(device);
-                    }
+                    //if (cue.frontDevice == null)
+                    //{
+                    //    cue.AttachFrontDevice(device);
+                    //} else if (cue.backDevice == null)
+                    //{
+                    //    cue.AttackBackDevice(device);
+                    //}
+
+                    cue.AttachDevice(device);
                 }
                 else
                 {
+                    //move any object entering the controller collider (FOR DEBUGGING)
                     collider.gameObject.transform.SetParent(gameObject.transform);
                 }
 
@@ -93,20 +96,33 @@ public class ViveControllerInput : MonoBehaviour
                 carrying = true;
             }
         }
-        else if (!carrying)
+    }
+
+    void OnTriggerEnter()
+    {
+        if (!carrying)
         {
-            //TODO vibrating! (touched but not grabbed)
-            StartCoroutine(LongVibration(2, 0.5f, 1f, 0.5f));
+            idlePulseEnumerator = PulseVibration(10000, 0.5f, 0.5f, 0.5f);
+            StartCoroutine(idlePulseEnumerator);
         }
+
+    }
+
+    void OnTriggerExit()
+    {
+        if (idlePulseEnumerator != null)
+            StopCoroutine(idlePulseEnumerator);
     }
 
 
     void RumbleController(float duration, float strength)
     {
-        StartCoroutine(RumbleControllerRoutine(duration, strength));
+        StartCoroutine(PulseVibration(duration, strength));
     }
 
-    IEnumerator RumbleControllerRoutine(float duration, float strength)
+    private IEnumerator idlePulseEnumerator;
+
+    IEnumerator PulseVibration(float duration, float strength)
     {
         strength = Mathf.Clamp01(strength);
         float startTime = Time.realtimeSinceStartup;
@@ -116,23 +132,22 @@ public class ViveControllerInput : MonoBehaviour
             int valveStrength = Mathf.RoundToInt(Mathf.Lerp(0, 3999, strength));
 
             device.TriggerHapticPulse((ushort)valveStrength);
-
             yield return null;
         }
     }
 
-    //not working yet TODO
+
     //vibrationCount is how many vibrations
     //vibrationLength is how long each vibration should go for
     //gapLength is how long to wait between vibrations
     //strength is vibration strength from 0-1
-    IEnumerator LongVibration(int vibrationCount, float vibrationLength, float gapLength, float strength)
+    IEnumerator PulseVibration(int vibrationCount, float vibrationLength, float gapLength, float strength)
     {
         strength = Mathf.Clamp01(strength);
         for (int i = 0; i < vibrationCount; i++)
         {
             if (i != 0) yield return new WaitForSeconds(gapLength);
-            yield return StartCoroutine(RumbleControllerRoutine(vibrationLength, strength));
+            yield return StartCoroutine(PulseVibration(vibrationLength, strength));
         }
     }
 
