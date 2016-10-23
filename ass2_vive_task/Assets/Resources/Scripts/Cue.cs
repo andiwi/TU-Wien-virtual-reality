@@ -41,6 +41,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
     void FixedUpdate()
     {
         calcVelocity();
+        
     }
 
 
@@ -149,7 +150,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
 
         if (hasTwoControllersAttached())
         {
-            transform.parent = null;
+            //transform.parent = null;
             //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos).normalized; 
             //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos);
             Vector3 dir = getFrontController().controllerTransform.position - getBackController().controllerTransform.position;
@@ -165,6 +166,11 @@ public class Cue : MonoBehaviour, IViveControlControllable
 
             //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
             transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            //transform.rotation = Quaternion.LookRotation(dir.normalized);
+            //transform.LookAt(getFrontController().controllerTransform.position);
+
+            //transform.Rotate(Quaternion.LookRotation(dir.normalized));
+            //Quaternion.
 
 
             //test1: 
@@ -177,9 +183,15 @@ public class Cue : MonoBehaviour, IViveControlControllable
             //Vector3 mid = dir / 2.0f + getBackController().device.transform.pos;        
             //transform.position = mid + transform.position;
 
-            Vector3 mid = dir / 2.0f + getBackController().controllerTransform.position;
-            Debug.Log("new mid: " + mid);
-            transform.position = mid;
+
+            //Vector3 newPos = (transform.position - getBackController().controllerTransform.position);
+            //transform.localPosition = tran
+
+            //Vector3 mid = dir / 2.0f + getBackController().controllerTransform.position;
+            //Debug.Log("new mid: " + mid);
+            //transform.position = mid;
+
+            //transform.localPosition;
 
 
             //transform.position = mid;
@@ -194,11 +206,11 @@ public class Cue : MonoBehaviour, IViveControlControllable
         }
         else if (hasOneControllerAttached())
         {
-            transform.SetParent(getBackController().controllerTransform);
+            //transform.SetParent(getBackController().controllerTransform);
         }
         else
         {
-            transform.parent = null;
+            //transform.parent = null;
         }
 
 

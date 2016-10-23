@@ -48,6 +48,8 @@ public class ViveControllerControl : MonoBehaviour
 
 
 
+    public bool testJoint;
+    public bool shitTest2;
 
     void OnTriggerStay(Collider collider)
     {
@@ -65,6 +67,47 @@ public class ViveControllerControl : MonoBehaviour
                 if (currentControllable != null)
                 {
                     currentControllable.AttachDevice(device, transform);
+                    Rigidbody rigid = GetComponent<Rigidbody>();
+                    if (shitTest2)
+                    {
+                        FixedJoint fuckYou = gameObject.AddComponent<FixedJoint>();
+                        fuckYou.connectedBody = collider.gameObject.GetComponent<Rigidbody>();
+                        //FixedJoint fuckYou = collider.gameObject.AddComponent<FixedJoint>();
+                        //fuckYou.connectedBody = rigid;
+                    }
+                    else
+                    {
+
+
+                        //if (testJoint)
+                        //{
+                        //    ConfigurableJoint confJoint = collider.gameObject.AddComponent<ConfigurableJoint>();
+                        //    confJoint.connectedBody = rigid;
+                        //    confJoint.xMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.yMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.zMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularXMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularYMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularZMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.anchor = transform.position;
+                        //    Debug.Log("added ConfJoint front");
+
+                        //}
+                        //else
+                        //{
+                        //    ConfigurableJoint confJoint = collider.gameObject.AddComponent<ConfigurableJoint>();
+                        //    confJoint.connectedBody = rigid;
+                        //    confJoint.xMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.yMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.zMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularXMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularYMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.angularZMotion = ConfigurableJointMotion.Locked;
+                        //    confJoint.anchor = transform.position;
+                        //    Debug.Log("added ConfJoint back");
+                        //}
+                    }
+
                     //collider.attachedRigidbody.isKinematic = true;
                     RumbleController(0.2f, 1f);
                     carrying = true;

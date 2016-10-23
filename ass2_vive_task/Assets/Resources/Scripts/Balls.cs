@@ -45,7 +45,7 @@ public class Balls : MonoBehaviour {
 		balls.Add(this.createBall(new Vector3 (0.25f, 0.38f, 0.25f), ball13_material, "ball13"));
 		balls.Add(this.createBall(new Vector3 (0, 0.76f, 0), ball14_material, "ball14"));
 
-		cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
+		//cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
 
 	}
 	
