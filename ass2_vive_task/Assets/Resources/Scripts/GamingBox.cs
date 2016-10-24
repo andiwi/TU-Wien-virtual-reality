@@ -13,8 +13,10 @@ public class GamingBox : MonoBehaviour {
 	private GameObject walls;
 	private GameObject holes;
 
-	// Use this for initialization
-	void Start () {
+    public Vector3 initialPosition = new Vector3(0, 0, 0);
+
+    // Use this for initialization
+    void Start () {
 		walls = new GameObject ("walls");
 		holes = new GameObject ("holes");
 
@@ -38,6 +40,7 @@ public class GamingBox : MonoBehaviour {
 		createHole(new Vector3(3.5f, 3.5f, 3.5f), "hole_right_back_bottom");
 
         //transform.localScale += new Vector3(-0.25f, -0.25f, -0.25f);
+        transform.position = initialPosition;
 
 		/*
 		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, -3.5f), "wall_front"));

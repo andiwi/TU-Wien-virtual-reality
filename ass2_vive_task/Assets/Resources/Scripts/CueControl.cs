@@ -36,7 +36,7 @@ public class CueControl : MonoBehaviour, IViveControlControllable
         if (attachedController == null)
         {
             attachedController = viveController;
-            attachedController.createFixedJoint(GetComponent<Rigidbody>());
+            attachedController.getOrientationHelber().createFixedJoint(GetComponent<Rigidbody>());
         }
 
     }
@@ -47,10 +47,14 @@ public class CueControl : MonoBehaviour, IViveControlControllable
     }
 
 
-    public void DetachController(ViveControllerControl viveController)
+    public void DetachController()
     {
-        attachedController.destroyFixedJoint(GetComponent<Rigidbody>());
-        attachedController = null;
+        if (attachedController != null)
+        {
+            attachedController.getOrientationHelber().destroyFixedJoint(GetComponent<Rigidbody>());
+            attachedController = null;
+        }
+
     }
 
     /**
@@ -71,18 +75,20 @@ public class CueControl : MonoBehaviour, IViveControlControllable
 
         Debug.Log("CueControl HIT " + collision.gameObject.name);
 
-        Rigidbody rigidCollider = collision.rigidbody;
+        if (collision.rigidbody)
+        {
+            Rigidbody rigidCollider = collision.rigidbody;
 
 
-        Vector3 force = velocity.normalized * forceStrength;
-        //Vector3 force = dir.normalized * forceStrength;
+            Vector3 force = velocity.normalized * forceStrength;
+            //Vector3 force = dir.normalized * forceStrength;
 
-        // rigidCollider.AddForce(dir.normalized * forceStrength, ForceMode.Impulse);
+            // rigidCollider.AddForce(dir.normalized * forceStrength, ForceMode.Impulse);
 
-        rigidCollider.AddForce(force, ForceMode.Force);
+            rigidCollider.AddForce(force, ForceMode.Force);
 
-        Debug.Log(" with cue! adding force: " + force);
-        //rigidCollider.velocity = rigidBody.velocity;
-        //rigidCollider.angularVelocity = rigidBody.angularVelocity;
+            Debug.Log(" with cue! adding force: " + force);
+
+        }
     }
 }

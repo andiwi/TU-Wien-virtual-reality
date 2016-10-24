@@ -5,25 +5,21 @@ using System.Collections;
 public class ViveControllerControl : MonoBehaviour
 {
 
-    SteamVR_TrackedObject trackedObj;
-    SteamVR_Controller.Device device;
+    private SteamVR_TrackedObject trackedObj;
+    private SteamVR_Controller.Device device;
 
-    bool carrying = false;
-    IViveControlControllable currentControllable;
+    private bool carrying = false;
+    private IViveControlControllable currentControllable;
 
     private IEnumerator idlePulseEnumerator;
 
-    Vector2 touchpad;
-
-    void Awake()
-    {
-        trackedObj = GetComponent<SteamVR_TrackedObject>();
-
-    }
+    private Vector2 touchpad;
 
     private Vector3 newpos;
     private Vector3 oldpos;
     private Vector3 deltapos;
+
+    private GameTransformator gameTransformator;
 
     private void calcDeltaPos()
     {
@@ -33,7 +29,19 @@ public class ViveControllerControl : MonoBehaviour
         newpos = transform.position;
     }
 
-    public float smoothFactor = 5f;
+    public float gameTransSmoothFactor = 5f;
+
+    void Awake()
+    {
+        trackedObj = GetComponent<SteamVR_TrackedObject>();
+
+    }
+
+    void Start()
+    {
+        GameObject game = GameObject.Find("Game");
+        gameTransformator = game.GetComponent<GameTransformator>();
+    }
 
     void Update()
     {
@@ -42,16 +50,8 @@ public class ViveControllerControl : MonoBehaviour
 
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Grip))
         {
-            Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);
-
-            //GameObject balls = GameObject.Find("Balls");
-            GameObject game = GameObject.Find("Game");
-
-            //gamingBox.transform.position += deltapos;
-            game.transform.position += (deltapos / smoothFactor);
-
-            // game.transform.SetParent(transform);
-
+            Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);       
+            gameTransformator.translateGame(deltapos);
         }
 
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
@@ -63,41 +63,20 @@ public class ViveControllerControl : MonoBehaviour
 
             if (touchpad.y > 0.2f || touchpad.y < -0.2f)
             {
-                GameObject game = GameObject.Find("Game");
-                game.transform.localScale += (new Vector3(touchpad.y, touchpad.y, touchpad.y))/ smoothFactor;
+                
+                //game.transform.localScale += (new Vector3(touchpad.y, touchpad.y, touchpad.y)) / gameTransSmoothFactor;
             }
 
         }
+    
 
     }
 
-
-    public void createFixedJoint(Rigidbody connectedBody)
+    public OrientationHelper getOrientationHelber()
     {
-        GameObject child = transform.GetChild(1).gameObject;
-
-        Rigidbody rigid = child.AddComponent<Rigidbody>();
-        rigid.isKinematic = true;
-        rigid.useGravity = false;
-
-        Orientation orient = child.GetComponent<Orientation>();
-
-        //set initial rotation
-        connectedBody.transform.rotation = orient.getRotation();
-        Debug.Log("orientation: " + orient.getRotation());
-
-        FixedJoint joint = child.AddComponent<FixedJoint>();
-        joint.connectedBody = connectedBody;
-        //joint.anchor = transform.position;
-        Debug.Log("setFixedJoint for " + connectedBody.name);
+        return transform.GetChild(1).gameObject.GetComponent<OrientationHelper>();
     }
 
-    public void destroyFixedJoint(Rigidbody connectedBody)
-    {
-        GameObject child = transform.GetChild(1).gameObject;
-        Destroy(child.GetComponent<FixedJoint>());
-        Destroy(child.GetComponent<Rigidbody>());
-    }
 
     void OnTriggerStay(Collider collider)
     {
@@ -117,9 +96,9 @@ public class ViveControllerControl : MonoBehaviour
                     if (!currentControllable.isControllerAttached())
                     {
                         currentControllable.AttachController(this);
-                        //collider.attachedRigidbody.isKinematic = true;
+
                         StopCoroutine(idlePulseEnumerator);
-                        RumbleController(0.2f, 1f);
+                        RumbleController(0.3f, 1f);
 
                     }
                     carrying = true;
@@ -139,7 +118,7 @@ public class ViveControllerControl : MonoBehaviour
 
         if (currentControllable != null)
         {
-            currentControllable.DetachController(this);
+            currentControllable.DetachController();
 
             RumbleController(0.1f, 0.5f);
             carrying = false;

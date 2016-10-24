@@ -3,8 +3,13 @@ using System.Collections;
 
 public class GameTransformator : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+
+    public float smoothFactor = 10f;
+
+    ViveControllerControl currControl1;
+    ViveControllerControl currControl2;
+
+    void Start () {
 
         
 	}
@@ -13,5 +18,27 @@ public class GameTransformator : MonoBehaviour {
         //transform.localScale += new Vector3(0.05f, 0.05f, 0.05f);
     }
 
+    public void rotateGame(ViveControllerControl control)
+    {
+
+    }
+
+    public void translateGame(Vector3 deltaPos)
+    {
+        transform.position += (deltaPos / smoothFactor);
+    }
+
+    public void scaleGame(Vector3 scale)
+    {
+        transform.localScale += scale / smoothFactor;
+    }
+
+    //private void calcDeltaPos()
+    //{
+    //    newpos = transform.position;
+    //    deltapos = (newpos - oldpos) / Time.deltaTime;
+    //    oldpos = newpos;
+    //    newpos = transform.position;
+    //}
 
 }

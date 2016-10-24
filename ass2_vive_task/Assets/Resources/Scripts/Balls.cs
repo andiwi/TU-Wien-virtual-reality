@@ -22,7 +22,9 @@ public class Balls : MonoBehaviour {
 
 	public PhysicMaterial ball_collider_material;
 
-	private GameObject cue_ball;
+    public Vector3 initialPosition = new Vector3(0, 0, 0);
+
+    private GameObject cue_ball;
 	private List<GameObject> balls = new List<GameObject>();
 
 	// Use this for initialization
@@ -48,6 +50,7 @@ public class Balls : MonoBehaviour {
         //cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
 
         transform.localScale += new Vector3(-0.25f, -0.25f, -0.25f);
+        transform.position = initialPosition;
 
     }
 	
