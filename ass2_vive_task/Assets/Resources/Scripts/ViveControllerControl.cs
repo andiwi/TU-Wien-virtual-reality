@@ -56,6 +56,12 @@ public class ViveControllerControl : MonoBehaviour
         {
             Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);
             gameTransformator.translateGame(deltapos);
+            gameTransformator.AttachRotator(this);
+        }
+
+        if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Grip))
+        {
+            gameTransformator.DetachRotator(this);
         }
 
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
