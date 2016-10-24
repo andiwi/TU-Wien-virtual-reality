@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Cue : MonoBehaviour, IViveControlControllable
+public class CueControl : MonoBehaviour, IViveControlControllable
 {
 
     Vector3 oldpos;
@@ -19,7 +19,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
      * sorted list of the controllers - sorted by the distance to the tip 
      * used to easily determine front and back device
      * */
-    System.Collections.Generic.SortedList<float, Controller> controllers;
+    System.Collections.Generic.SortedList<float, ViveControllerControl> controllers;
 
     bool twoControllerMode = false;
 
@@ -27,7 +27,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
 
     void Start()
     {
-        controllers = new System.Collections.Generic.SortedList<float, Controller>();
+        controllers = new System.Collections.Generic.SortedList<float, ViveControllerControl>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
         oldpos = transform.position;
     }
@@ -35,7 +35,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
 
     void Update()
     {
-        changePosition();
+        //changePosition();
     }
 
     void FixedUpdate()
@@ -44,17 +44,28 @@ public class Cue : MonoBehaviour, IViveControlControllable
         
     }
 
+    FixedJoint fix;
 
-    public void AttachDevice(SteamVR_Controller.Device device, Transform parentableTransform)
+    public void AttachController(ViveControllerControl viveController)
     {
-        if (!isDeviceAttached(device))
+        if (!isControllerAttached(viveController))
         {
             Vector3 tipPos = new Vector3(0, transform.localScale.y) + transform.position; //TODO optimize
 
-            float distanceFromTip = (tipPos - device.transform.pos).magnitude;
-            Controller newController = new Controller(device, parentableTransform);
-            controllers.Add(distanceFromTip, newController);
+            float distanceFromTip = (tipPos - deviceGameObject.transform.position).magnitude;
+            //Controller newController = new Controller(device, parentableTransform);
+            controllers.Add(distanceFromTip, deviceGameObject);
             Debug.Log("attaching device - distanceFromTip: " + distanceFromTip + " , controllers size is now: " + controllers.Count);
+
+            if (controllers.Count == 1)
+            {
+                fix = gameObject.AddComponent<FixedJoint>();
+                fix.connectedBody = deviceGameObject.GetComponent<Rigidbody>();
+                //fix.autoConfigureConnectedAnchor = false;
+                // fix.connectedAnchor = deviceGameObject.transform.position;
+                fix.anchor = Vector3.zero;
+                //fix.connectedAnchor = Vector3.zero;
+            }
         }
         else
         {
@@ -62,49 +73,52 @@ public class Cue : MonoBehaviour, IViveControlControllable
         }
     }
 
-    public void DetachDevice(SteamVR_Controller.Device device)
+    public void DetachController(ViveControllerControl viveController)
     {
 
-        Controller foundController = getControllerByDevice(device);
+        //Controller foundController = getControllerByDevice(device);
 
-        if (foundController != null)
-        {
-            controllers.RemoveAt(controllers.IndexOfValue(foundController));
-            //controllers.Values.Remove(device); //TODO work on removing..
+        Debug.Log("TODO reimplement");
 
-            Debug.Log("removed device controllers size is now: " + controllers.Count);
-        }
-        else
-        {
-            Debug.Log("Tried to detachDevice - but device not attached");
-        }
+        //if (foundController != null)
+        //{
+        //    controllers.RemoveAt(controllers.IndexOfValue(foundController));
+        //    //controllers.Values.Remove(device); //TODO work on removing..
+
+        //    Debug.Log("removed device controllers size is now: " + controllers.Count);
+        //}
+        //else
+        //{
+        //    Debug.Log("Tried to detachDevice - but device not attached");
+        //}
     }
 
 
 
-    private bool isDeviceAttached(SteamVR_Controller.Device device)
+    private bool isControllerAttached(ViveControllerControl viveController)
     {
-        Controller foundController = getControllerByDevice(device);
-        return foundController != null;
+        return controllers.ContainsValue(viveController);
+        //Controller foundController = getControllerByDevice(device);
+        //return foundController != null;
     }
 
-    private Controller getControllerByDevice(SteamVR_Controller.Device device)
-    {
-        foreach (System.Collections.Generic.KeyValuePair<float, Controller> curr in controllers)
-        {
-            if (curr.Value.device.Equals(device))
-            {
-                return curr.Value;
-            }
-        }
+    //private Controller getControllerByDevice(SteamVR_Controller.Device device)
+    //{
+    //    foreach (System.Collections.Generic.KeyValuePair<float, Controller> curr in controllers)
+    //    {
+    //        if (curr.Value.device.Equals(device))
+    //        {
+    //            return curr.Value;
+    //        }
+    //    }
 
-        return null;
-    }
-
-
+    //    return null;
+    //}
 
 
-    private Controller getBackController()
+
+
+    private GameObject getBackController()
     {
         if (hasOneControllerAttached())
         {
@@ -121,7 +135,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
         }
     }
 
-    private Controller getFrontController()
+    private GameObject getFrontController()
     {
         if (hasTwoControllersAttached())
         {
@@ -153,10 +167,10 @@ public class Cue : MonoBehaviour, IViveControlControllable
             //transform.parent = null;
             //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos).normalized; 
             //Vector3 dir = (getFrontController().device.transform.pos - getBackController().device.transform.pos);
-            Vector3 dir = getFrontController().controllerTransform.position - getBackController().controllerTransform.position;
+            Vector3 dir = getFrontController().transform.position - getBackController().transform.position;
 
             //Debug.Log("changePos: frontPos: " + getFrontController().device.transform.pos + ", backPos: " + getBackController().device.transform.pos + ", dir: " + dir);
-            Debug.Log("changePos: frontPos: " + getFrontController().controllerTransform.position + ", backPos: " + getBackController().controllerTransform.position + ", dir: " + dir);
+            Debug.Log("changePos: frontPos: " + getFrontController().transform.position + ", backPos: " + getBackController().transform.position + ", dir: " + dir);
 
             //Quaternion rotation = Quaternion.LookRotation(dir);
 
@@ -165,13 +179,19 @@ public class Cue : MonoBehaviour, IViveControlControllable
             //float rotationSpeed = 1f; //test
 
             //transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            //transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
             //transform.rotation = Quaternion.LookRotation(dir.normalized);
+
+            transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+            //transform.localRotation = Quaternion.LookRotation(dir.normalized);
             //transform.LookAt(getFrontController().controllerTransform.position);
 
             //transform.Rotate(Quaternion.LookRotation(dir.normalized));
             //Quaternion.
 
+            //fix.connectedAnchor = getBackController().transform.position;
+
+            Debug.Log("connectedAnchorPos: " +  fix.connectedAnchor);
 
             //test1: 
             //Vector3 testBack = getBackController().device.transform.pos - transform.position;
@@ -230,6 +250,7 @@ public class Cue : MonoBehaviour, IViveControlControllable
 
     public float forceStrength;
 
+
     void OnCollisionEnter(Collision collision)
     {
 
@@ -249,17 +270,5 @@ public class Cue : MonoBehaviour, IViveControlControllable
         Debug.Log("HIT something with cue! adding force: " + force);
         //rigidCollider.velocity = rigidBody.velocity;
         //rigidCollider.angularVelocity = rigidBody.angularVelocity;
-    }
-
-    private class Controller
-    {
-        public SteamVR_Controller.Device device;
-        public Transform controllerTransform;
-
-        public Controller(SteamVR_Controller.Device device, Transform controllerTransform)
-        {
-            this.device = device;
-            this.controllerTransform = controllerTransform;
-        }
     }
 }

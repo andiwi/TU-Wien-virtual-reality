@@ -51,6 +51,8 @@ public class ViveControllerControl : MonoBehaviour
     public bool testJoint;
     public bool shitTest2;
 
+    public Transform posOtherControl;
+
     void OnTriggerStay(Collider collider)
     {
 
@@ -66,52 +68,30 @@ public class ViveControllerControl : MonoBehaviour
 
                 if (currentControllable != null)
                 {
-                    currentControllable.AttachDevice(device, transform);
-                    Rigidbody rigid = GetComponent<Rigidbody>();
-                    if (shitTest2)
-                    {
-                        FixedJoint fuckYou = gameObject.AddComponent<FixedJoint>();
-                        fuckYou.connectedBody = collider.gameObject.GetComponent<Rigidbody>();
-                        //FixedJoint fuckYou = collider.gameObject.AddComponent<FixedJoint>();
-                        //fuckYou.connectedBody = rigid;
-                    }
-                    else
-                    {
+                    //currentControllable.AttachDevice(gameObject);
 
 
-                        //if (testJoint)
-                        //{
-                        //    ConfigurableJoint confJoint = collider.gameObject.AddComponent<ConfigurableJoint>();
-                        //    confJoint.connectedBody = rigid;
-                        //    confJoint.xMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.yMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.zMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularXMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularYMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularZMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.anchor = transform.position;
-                        //    Debug.Log("added ConfJoint front");
+                    GameObject child = transform.GetChild(1).gameObject;
+                
+                    Rigidbody rigid = child.AddComponent<Rigidbody>();
+                    rigid.isKinematic = true;
+                    rigid.useGravity = false;            
 
-                        //}
-                        //else
-                        //{
-                        //    ConfigurableJoint confJoint = collider.gameObject.AddComponent<ConfigurableJoint>();
-                        //    confJoint.connectedBody = rigid;
-                        //    confJoint.xMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.yMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.zMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularXMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularYMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.angularZMotion = ConfigurableJointMotion.Locked;
-                        //    confJoint.anchor = transform.position;
-                        //    Debug.Log("added ConfJoint back");
-                        //}
-                    }
+                    Orientation orient = child.GetComponent<Orientation>();
+
+                    collider.gameObject.transform.rotation = orient.getRotation();
+
+                    FixedJoint joint = child.AddComponent<FixedJoint>();
+                    joint.connectedBody = collider.gameObject.GetComponent<Rigidbody>();
+                    Debug.Log("setFixedJoint");
+
+
 
                     //collider.attachedRigidbody.isKinematic = true;
+                    StopCoroutine(idlePulseEnumerator);
                     RumbleController(0.2f, 1f);
                     carrying = true;
-                    StartCoroutine(idlePulseEnumerator);
+
                 }
             }
             else
@@ -127,10 +107,21 @@ public class ViveControllerControl : MonoBehaviour
 
         if (currentControllable != null)
         {
-            currentControllable.DetachDevice(device);
+            //currentControllable.DetachDevice(gameObject);
+
+            GameObject child = transform.GetChild(1).gameObject;
+            Destroy(child.GetComponent<FixedJoint>());
+            Destroy(child.GetComponent<Rigidbody>());
+            
+        
             RumbleController(0.1f, 0.5f);
             carrying = false;
         }
+    }
+
+    void OnJointBreak(float breakForce)
+    {
+        Debug.Log("OnJointBreak() called - joint apparently broke :( force: " + breakForce);
     }
 
 
