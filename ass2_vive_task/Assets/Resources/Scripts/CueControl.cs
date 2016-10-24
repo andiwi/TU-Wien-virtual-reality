@@ -11,6 +11,7 @@ public class CueControl : MonoBehaviour, IViveControlControllable
     public float forceStrength;
 
     ViveControllerControl attachedController;
+    
 
     void Start()
     {
@@ -77,11 +78,8 @@ public class CueControl : MonoBehaviour, IViveControlControllable
                 attachedController.RumbleController(0.2f, 0.6f);
             }
 
-
-            Vector3 force = velocity.normalized * forceStrength;
-            //Vector3 force = dir.normalized * forceStrength;
-
-            // rigidCollider.AddForce(dir.normalized * forceStrength, ForceMode.Impulse);
+            Vector3 force = velocity * forceStrength;
+            //Vector3 force = velocity.normalized * forceStrength;
 
             rigidCollider.AddForce(force, ForceMode.Force);
 

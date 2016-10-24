@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameTransformator : MonoBehaviour {
 
@@ -16,6 +17,12 @@ public class GameTransformator : MonoBehaviour {
 	
 	void Update () {
         //transform.localScale += new Vector3(0.05f, 0.05f, 0.05f);
+    }
+
+    public void resetGame()
+    {
+        SceneManager.LoadScene("scene_main");
+        
     }
 
     public void rotateGame(ViveControllerControl control)

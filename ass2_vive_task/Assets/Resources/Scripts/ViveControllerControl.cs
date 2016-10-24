@@ -73,6 +73,12 @@ public class ViveControllerControl : MonoBehaviour
 
         }
 
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.ApplicationMenu))
+        {
+            Debug.Log("Pushed Menu - sry no menu implemented, but restarting the game now: ");
+            gameTransformator.resetGame();
+        }
+
     }
 
     /** 

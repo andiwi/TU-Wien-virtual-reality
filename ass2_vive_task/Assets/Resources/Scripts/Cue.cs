@@ -11,6 +11,8 @@ public class Cue : MonoBehaviour {
     public Vector3 initialPosition = new Vector3(0.2f, -0.1f, -1.8f);
     public Vector3 initialRotation = new Vector3(0, 0, 90);
 
+    public float cueMass = 2f;
+
     // Use this for initialization
     void Start () {
         cue = Instantiate(cuePrefab);
@@ -18,7 +20,7 @@ public class Cue : MonoBehaviour {
         cue.transform.Rotate(initialRotation);
         cue.transform.parent = transform;
         Rigidbody rigidCue = cue.GetComponent<Rigidbody>();
-        rigidCue.mass = 2f;
+        rigidCue.mass = cueMass;
     }
 	
 	// Update is called once per frame

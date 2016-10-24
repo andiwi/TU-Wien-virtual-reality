@@ -27,8 +27,13 @@ public class Balls : MonoBehaviour {
     private GameObject cue_ball;
 	private List<GameObject> balls = new List<GameObject>();
 
-	// Use this for initialization
-	void Start () {
+    public float ballDrag = 0.5f;
+    public float ballAngularDrag = 0.5f;
+    public float ballMass = 1f;
+
+
+    // Use this for initialization
+    void Start () {
 		
 		cue_ball = this.createBall(new Vector3 (0, 0f, -1.5f), ball0_material, "CueBall");
 
@@ -53,26 +58,6 @@ public class Balls : MonoBehaviour {
         transform.position = initialPosition;
 
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    public void rotateBalls()
-    {
-
-    }
-
-    public void translateBalls()
-    {
-
-    }
-
-    public void scaleBalls()
-    {
-
-    }
 
 	private GameObject createBall(Vector3 position, Material material, string name) {
 		GameObject ball = GameObject.CreatePrimitive (PrimitiveType.Sphere);
@@ -85,10 +70,10 @@ public class Balls : MonoBehaviour {
 		ball.GetComponent<Collider>().material = ball_collider_material;
 
 		Rigidbody rb = ball.AddComponent<Rigidbody>();
-		rb.drag = 0.5f;
-		rb.angularDrag = 0.5f;
+		rb.drag = ballDrag;
+		rb.angularDrag = ballAngularDrag;
 		rb.useGravity = false;
-
-		return ball;
+        rb.mass = ballMass;
+        return ball;
 	}
 }
