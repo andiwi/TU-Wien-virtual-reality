@@ -60,7 +60,7 @@ public class Balls : MonoBehaviour {
 		ball.transform.position = position;
 		ball.tag = "Ball";
 		ball.name = name;
-		ball.transform.parent = GameObject.Find("Balls").transform;
+		ball.transform.parent = transform;
 		ball.GetComponent<Renderer> ().sharedMaterial = material;
 		ball.GetComponent<Collider>().material = ball_collider_material;
 

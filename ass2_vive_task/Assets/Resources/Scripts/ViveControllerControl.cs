@@ -46,12 +46,38 @@ public class ViveControllerControl : MonoBehaviour
         }
     }
 
+    public void createFixedJoint(Rigidbody connectedBody)
+    {
+        GameObject child = transform.GetChild(1).gameObject;
+
+        Rigidbody rigid = child.AddComponent<Rigidbody>();
+        rigid.isKinematic = true;
+        rigid.useGravity = false;
+
+        Orientation orient = child.GetComponent<Orientation>();
+
+        //set initial rotation
+        connectedBody.transform.rotation = orient.getRotation();
+        Debug.Log("orientation: " + orient.getRotation());
+
+        Debug.Log("");
+
+        //Vector3 mid = dir / 2.0f + transform.pos;        
+        //transform.position = mid + transform.position;
 
 
-    public bool testJoint;
-    public bool shitTest2;
+        FixedJoint joint = child.AddComponent<FixedJoint>();
+        joint.connectedBody = connectedBody;
+        //joint.anchor = transform.position;
+        Debug.Log("setFixedJoint for " + connectedBody.name);
+    }
 
-    public Transform posOtherControl;
+    public void destroyFixedJoint(Rigidbody connectedBody)
+    {
+        GameObject child = transform.GetChild(1).gameObject;
+        Destroy(child.GetComponent<FixedJoint>());
+        Destroy(child.GetComponent<Rigidbody>());
+    }
 
     void OnTriggerStay(Collider collider)
     {
@@ -68,30 +94,15 @@ public class ViveControllerControl : MonoBehaviour
 
                 if (currentControllable != null)
                 {
-                    //currentControllable.AttachDevice(gameObject);
-
-
-                    GameObject child = transform.GetChild(1).gameObject;
-                
-                    Rigidbody rigid = child.AddComponent<Rigidbody>();
-                    rigid.isKinematic = true;
-                    rigid.useGravity = false;            
-
-                    Orientation orient = child.GetComponent<Orientation>();
-
-                    collider.gameObject.transform.rotation = orient.getRotation();
-
-                    FixedJoint joint = child.AddComponent<FixedJoint>();
-                    joint.connectedBody = collider.gameObject.GetComponent<Rigidbody>();
-                    Debug.Log("setFixedJoint");
-
-
-
-                    //collider.attachedRigidbody.isKinematic = true;
-                    StopCoroutine(idlePulseEnumerator);
-                    RumbleController(0.2f, 1f);
+                    if (!currentControllable.isControllerAttached())
+                    {
+                        currentControllable.AttachController(this);
+                        //collider.attachedRigidbody.isKinematic = true;
+                        StopCoroutine(idlePulseEnumerator);
+                        RumbleController(0.2f, 1f);
+                     
+                    }
                     carrying = true;
-
                 }
             }
             else
@@ -107,13 +118,8 @@ public class ViveControllerControl : MonoBehaviour
 
         if (currentControllable != null)
         {
-            //currentControllable.DetachDevice(gameObject);
+            currentControllable.DetachController(this);
 
-            GameObject child = transform.GetChild(1).gameObject;
-            Destroy(child.GetComponent<FixedJoint>());
-            Destroy(child.GetComponent<Rigidbody>());
-            
-        
             RumbleController(0.1f, 0.5f);
             carrying = false;
         }
