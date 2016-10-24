@@ -12,8 +12,6 @@ public class CueControl : MonoBehaviour, IViveControlControllable
 
     ViveControllerControl attachedController;
 
-    private bool controllerAttached = false;
-
     void Start()
     {
         oldpos = transform.position;
@@ -32,13 +30,8 @@ public class CueControl : MonoBehaviour, IViveControlControllable
 
     public void AttachController(ViveControllerControl viveController)
     {
-
-        if (attachedController == null)
-        {
-            attachedController = viveController;
-            attachedController.getOrientationHelber().createFixedJoint(GetComponent<Rigidbody>());
-        }
-
+        attachedController = viveController;
+        attachedController.getOrientationHelber().createFixedJoint(GetComponent<Rigidbody>());
     }
 
     public bool isControllerAttached()
@@ -78,6 +71,11 @@ public class CueControl : MonoBehaviour, IViveControlControllable
         if (collision.rigidbody)
         {
             Rigidbody rigidCollider = collision.rigidbody;
+
+            if (isControllerAttached())
+            {
+                attachedController.RumbleController(0.2f, 0.6f);
+            }
 
 
             Vector3 force = velocity.normalized * forceStrength;

@@ -85,7 +85,7 @@ public class Balls : MonoBehaviour {
 		ball.GetComponent<Collider>().material = ball_collider_material;
 
 		Rigidbody rb = ball.AddComponent<Rigidbody>();
-		rb.drag = 0.7f;
+		rb.drag = 0.5f;
 		rb.angularDrag = 0.5f;
 		rb.useGravity = false;
 

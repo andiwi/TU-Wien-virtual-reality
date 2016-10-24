@@ -8,10 +8,10 @@ public class ViveControllerControl : MonoBehaviour
     private SteamVR_TrackedObject trackedObj;
     private SteamVR_Controller.Device device;
 
-    private bool carrying = false;
     private IViveControlControllable currentControllable;
 
     private IEnumerator idlePulseEnumerator;
+    private bool idlePulse = false;
 
     private Vector2 touchpad;
 
@@ -20,6 +20,9 @@ public class ViveControllerControl : MonoBehaviour
     private Vector3 deltapos;
 
     private GameTransformator gameTransformator;
+
+
+
 
     private void calcDeltaPos()
     {
@@ -41,6 +44,7 @@ public class ViveControllerControl : MonoBehaviour
     {
         GameObject game = GameObject.Find("Game");
         gameTransformator = game.GetComponent<GameTransformator>();
+        idlePulseEnumerator = PulseVibration(10000, 0.15f, 0.5f, 0.05f);
     }
 
     void Update()
@@ -50,7 +54,7 @@ public class ViveControllerControl : MonoBehaviour
 
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Grip))
         {
-            Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);       
+            Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);
             gameTransformator.translateGame(deltapos);
         }
 
@@ -63,52 +67,75 @@ public class ViveControllerControl : MonoBehaviour
 
             if (touchpad.y > 0.2f || touchpad.y < -0.2f)
             {
-                
+
                 //game.transform.localScale += (new Vector3(touchpad.y, touchpad.y, touchpad.y)) / gameTransSmoothFactor;
             }
 
         }
-    
 
     }
 
+    /** 
+     * gets the controller orientation helper */
     public OrientationHelper getOrientationHelber()
     {
         return transform.GetChild(1).gameObject.GetComponent<OrientationHelper>();
     }
 
+    void StartIdlePulse()
+    {
+        StartCoroutine(idlePulseEnumerator);
+        idlePulse = true;
+    }
+    void StopIdlePulse()
+    {
+        StopCoroutine(idlePulseEnumerator);
+        idlePulse = false;
+    }
 
     void OnTriggerStay(Collider collider)
     {
+        currentControllable = collider.gameObject.GetComponent<IViveControlControllable>();
 
-        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
+        if (currentControllable != null)
         {
-            Debug.Log("OnTriggerStay - Touched down Trigger and collided with collider: " + collider.name);
-
-            if (!carrying)
+            if (currentControllable.isControllerAttached())
             {
-                //Debug.Log("Debug: devicePos is: " + device.transform.pos + " , thisTransform is: " + transform.position);
+                StopIdlePulse();
+            }
+            else if (!idlePulse)
+            {
+                StartIdlePulse();
+            }
 
-                currentControllable = collider.gameObject.GetComponent<IViveControlControllable>();
+            if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                Debug.Log("OnTriggerStay - Touched down Trigger and collided with collider: " + collider.name);
 
-                if (currentControllable != null)
+                //currentControllable = collider.gameObject.GetComponent<IViveControlControllable>();
+
+
+                if (!currentControllable.isControllerAttached())
                 {
-                    if (!currentControllable.isControllerAttached())
-                    {
-                        currentControllable.AttachController(this);
+                    //Debug.Log("Debug: devicePos is: " + device.transform.pos + " , thisTransform is: " + transform.position);
 
-                        StopCoroutine(idlePulseEnumerator);
-                        RumbleController(0.3f, 1f);
+                    Debug.Log("attaching controller via " + gameObject.name);
+                    currentControllable.AttachController(this);
 
-                    }
-                    carrying = true;
+                    RumbleController(0.4f, 1f);
+
+                }
+                else
+                {
+                    dropControllable();
                 }
             }
-            else
-            {
-                dropControllable();
-            }
         }
+        else
+        {
+            StopIdlePulse();
+        }
+
 
     }
 
@@ -120,8 +147,7 @@ public class ViveControllerControl : MonoBehaviour
         {
             currentControllable.DetachController();
 
-            RumbleController(0.1f, 0.5f);
-            carrying = false;
+            RumbleController(0.3f, 0.8f);
         }
     }
 
@@ -131,24 +157,33 @@ public class ViveControllerControl : MonoBehaviour
     }
 
 
-    void OnTriggerEnter()
+    //void OnTriggerEnter(Collider collider)
+    //{
+    //    IViveControlControllable controllable = collider.gameObject.GetComponent<IViveControlControllable>();
+
+    //    if (controllable != null && !controllable.isControllerAttached())
+    //    {
+    //        idlePulseEnumerator = PulseVibration(10000, 0.2f, 0.5f, 0.1f);
+    //        StartCoroutine(idlePulseEnumerator);
+    //    }
+
+    //}
+
+    void OnTriggerExit(Collider collider)
     {
-        if (!carrying)
+        IViveControlControllable controllable = collider.gameObject.GetComponent<IViveControlControllable>();
+
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger) && controllable != null && controllable.isControllerAttached())
         {
-            idlePulseEnumerator = PulseVibration(10000, 0.2f, 0.5f, 0.1f);
-            StartCoroutine(idlePulseEnumerator);
+            dropControllable();
         }
 
-    }
 
-    void OnTriggerExit()
-    {
-        if (idlePulseEnumerator != null)
-            StopCoroutine(idlePulseEnumerator);
+        StopIdlePulse();
     }
 
 
-    void RumbleController(float duration, float strength)
+    public void RumbleController(float duration, float strength)
     {
         StartCoroutine(PulseVibration(duration, strength));
     }

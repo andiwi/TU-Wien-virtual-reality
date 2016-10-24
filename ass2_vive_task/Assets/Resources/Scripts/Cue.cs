@@ -17,7 +17,8 @@ public class Cue : MonoBehaviour {
         cue.transform.position = initialPosition;
         cue.transform.Rotate(initialRotation);
         cue.transform.parent = transform;
-
+        Rigidbody rigidCue = cue.GetComponent<Rigidbody>();
+        rigidCue.mass = 2f;
     }
 	
 	// Update is called once per frame
