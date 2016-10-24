@@ -23,15 +23,6 @@ public class ViveControllerControl : MonoBehaviour
 
 
 
-
-    private void calcDeltaPos()
-    {
-        newpos = transform.position;
-        deltapos = (newpos - oldpos) / Time.deltaTime;
-        oldpos = newpos;
-        newpos = transform.position;
-    }
-
     public float gameTransSmoothFactor = 5f;
 
     void Awake()
@@ -46,6 +37,15 @@ public class ViveControllerControl : MonoBehaviour
         gameTransformator = game.GetComponent<GameTransformator>();
         idlePulseEnumerator = PulseVibration(10000, 0.15f, 0.5f, 0.05f);
     }
+
+    private void calcDeltaPos()
+    {
+        newpos = transform.position;
+        deltapos = (newpos - oldpos) / Time.deltaTime;
+        oldpos = newpos;
+        newpos = transform.position;
+    }
+
 
     void Update()
     {
@@ -69,6 +69,8 @@ public class ViveControllerControl : MonoBehaviour
             {
 
                 //game.transform.localScale += (new Vector3(touchpad.y, touchpad.y, touchpad.y)) / gameTransSmoothFactor;
+
+                gameTransformator.scaleGame(new Vector3(touchpad.y, touchpad.y, touchpad.y));
             }
 
         }
