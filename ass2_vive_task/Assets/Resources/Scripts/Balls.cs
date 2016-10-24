@@ -28,7 +28,7 @@ public class Balls : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		
-		cue_ball = this.createBall(new Vector3 (0, 0.5f, -1.5f), ball0_material, "CueBall");
+		cue_ball = this.createBall(new Vector3 (0, 0f, -1.5f), ball0_material, "CueBall");
 
 		balls.Add(this.createBall(new Vector3 (-0.5f, 0, -0.5f), ball1_material, "ball1"));
 		balls.Add(this.createBall(new Vector3 (-0.5f, 0, 0), ball2_material, "ball2"));
@@ -45,14 +45,31 @@ public class Balls : MonoBehaviour {
 		balls.Add(this.createBall(new Vector3 (0.25f, 0.38f, 0.25f), ball13_material, "ball13"));
 		balls.Add(this.createBall(new Vector3 (0, 0.76f, 0), ball14_material, "ball14"));
 
-		//cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
+        //cue_ball.GetComponent<Rigidbody> ().AddForce (transform.forward * 1000);
 
-	}
+        transform.localScale += new Vector3(-0.25f, -0.25f, -0.25f);
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    public void rotateBalls()
+    {
+
+    }
+
+    public void translateBalls()
+    {
+
+    }
+
+    public void scaleBalls()
+    {
+
+    }
 
 	private GameObject createBall(Vector3 position, Material material, string name) {
 		GameObject ball = GameObject.CreatePrimitive (PrimitiveType.Sphere);

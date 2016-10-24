@@ -37,6 +37,8 @@ public class GamingBox : MonoBehaviour {
 		createHole(new Vector3(3.5f, 3.5f, -3.5f), "hole_right_front_top");
 		createHole(new Vector3(3.5f, 3.5f, 3.5f), "hole_right_back_bottom");
 
+        //transform.localScale += new Vector3(-0.25f, -0.25f, -0.25f);
+
 		/*
 		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, -3.5f), "wall_front"));
 		walls.Add (createWall (new Vector3 (7, 7, 0.1f), new Vector3 (0, 0, 3.5f), "wall_back"));

@@ -13,38 +13,64 @@ public class ViveControllerControl : MonoBehaviour
 
     private IEnumerator idlePulseEnumerator;
 
+    Vector2 touchpad;
+
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
+
     }
+
+    private Vector3 newpos;
+    private Vector3 oldpos;
+    private Vector3 deltapos;
+
+    private void calcDeltaPos()
+    {
+        newpos = transform.position;
+        deltapos = (newpos - oldpos) / Time.deltaTime;
+        oldpos = newpos;
+        newpos = transform.position;
+    }
+
+    public float smoothFactor = 5f;
 
     void Update()
     {
-
-    }
-
-    void FixedUpdate()
-    {
+        calcDeltaPos();
         device = SteamVR_Controller.Input((int)trackedObj.index);
 
-        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Trigger))
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Grip))
         {
-            Debug.Log("Pressed Trigger");
+            Debug.Log("Pushed Grip - going tanslate mode, curr deltapos: " + deltapos);
 
+            //GameObject balls = GameObject.Find("Balls");
+            GameObject game = GameObject.Find("Game");
 
+            //gamingBox.transform.position += deltapos;
+            game.transform.position += (deltapos / smoothFactor);
 
+            // game.transform.SetParent(transform);
 
         }
 
-        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Grip))
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
         {
+            //Read the touchpad values
+            touchpad = device.GetAxis();
 
-            GameObject sphere = GameObject.FindGameObjectWithTag("TestSphere");
-            sphere.transform.position = new Vector3(-1, 1, -0.3f);
-            sphere.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            Debug.Log("Touched Touchpad pos: " + touchpad);
+
+            if (touchpad.y > 0.2f || touchpad.y < -0.2f)
+            {
+                GameObject game = GameObject.Find("Game");
+                game.transform.localScale += (new Vector3(touchpad.y, touchpad.y, touchpad.y))/ smoothFactor;
+            }
 
         }
+
     }
+
 
     public void createFixedJoint(Rigidbody connectedBody)
     {
@@ -59,12 +85,6 @@ public class ViveControllerControl : MonoBehaviour
         //set initial rotation
         connectedBody.transform.rotation = orient.getRotation();
         Debug.Log("orientation: " + orient.getRotation());
-
-        Debug.Log("");
-
-        //Vector3 mid = dir / 2.0f + transform.pos;        
-        //transform.position = mid + transform.position;
-
 
         FixedJoint joint = child.AddComponent<FixedJoint>();
         joint.connectedBody = connectedBody;
@@ -100,7 +120,7 @@ public class ViveControllerControl : MonoBehaviour
                         //collider.attachedRigidbody.isKinematic = true;
                         StopCoroutine(idlePulseEnumerator);
                         RumbleController(0.2f, 1f);
-                     
+
                     }
                     carrying = true;
                 }
@@ -110,6 +130,7 @@ public class ViveControllerControl : MonoBehaviour
                 dropControllable();
             }
         }
+
     }
 
     private void dropControllable()

@@ -13,6 +13,12 @@ public class HoleTrigger : MonoBehaviour {
 
 	void OnTriggerExit (Collider other) {
 		other.isTrigger = false; //so that ball cannot fall back in box
-		other.attachedRigidbody.useGravity = true;
+
+        if(other.GetComponent<IViveControlControllable>() == null)
+        {
+            //workaround if cue is toching the hole (or any controllable item)
+            other.attachedRigidbody.useGravity = true;
+        }
+		
 	}
 }
