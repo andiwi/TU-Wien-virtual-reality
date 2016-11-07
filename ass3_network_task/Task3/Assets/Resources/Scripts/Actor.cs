@@ -13,14 +13,15 @@ public class Actor : NetworkBehaviour {
 
     //this part is for object sharing
     //*******************************
-    List<NetworkIdentity> sharedObjects; // shared objects on the server or localActor
+    //List<NetworkIdentity> sharedObjects; // shared objects on the server or localActor
+    List<AuthorityManager> sharedObjects; // shared objects on the server or localActor
     //*******************************
 
 
     protected virtual void Awake()
     {
         transform = base.transform;
-        sharedObjects = new List<NetworkIdentity>();
+        sharedObjects = new List<AuthorityManager>();
     }
 
     // Use this for initialization
@@ -36,12 +37,7 @@ public class Actor : NetworkBehaviour {
             }
 
             //TODO objects should be same on server/client anyways - no?
-            foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
-            {
-                NetworkIdentity identitySharedObject = curr.GetComponent<NetworkIdentity>();
 
-                sharedObjects.Add(identitySharedObject);
-            }
 
             //this part is for object sharing
             //*******************************
@@ -49,7 +45,11 @@ public class Actor : NetworkBehaviour {
             {
                 Debug.Log("Actor name: " + prefabName + " , is SERVER");
                 // find objects that can be manipulated 
-              
+                foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+                {
+                    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
+                    sharedObjects.Add(authObj);
+                }
 
                 // TIPP : you can use a specific tag for all GO's that can be manipulated by players
 
@@ -59,6 +59,12 @@ public class Actor : NetworkBehaviour {
             {
                 Debug.Log("Actor name: " + prefabName + " , is LOCAL PLAYER");
                 // find objects that can be manipulated 
+                foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+                {
+                    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
+                    authObj.AssignActor(this);
+                    sharedObjects.Add(authObj);
+                }
 
                 // assign this Actor to the localActor field of the AuthorityManager component of each shared object
             }
@@ -86,6 +92,8 @@ public class Actor : NetworkBehaviour {
         //DEBUG
         if(Input.GetKeyDown(KeyCode.Space)){
             debugLog("Pressed space bar");
+
+            
         }
     }
 
@@ -195,6 +203,9 @@ public class Actor : NetworkBehaviour {
     public void RequestObjectAuthority(NetworkIdentity netID)
     {
         debugLog("RequestObjectAuthority...");
+
+        CmdAssignObjectAuthorityToClient(netID);
+
     }
 
     // should only be run on localPlayer (by the AuthorityManager of a shared object)
@@ -202,6 +213,8 @@ public class Actor : NetworkBehaviour {
     public void ReturnObjectAuthority(NetworkIdentity netID)
     {
         debugLog("ReturnObjectAuthority...");
+
+        CmdRemoveObjectAuthorityFromClient(netID);
     }
 
 
@@ -211,9 +224,13 @@ public class Actor : NetworkBehaviour {
     void CmdAssignObjectAuthorityToClient(NetworkIdentity netID)
     {
 
-        debugLog("CmdAssignObjectAuthorityToClient received");
-        NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
-        test.AssignClientAuthority(connectionToClient);
+      
+        //NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
+        //test.AssignClientAuthority(connectionToClient);
+
+        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netId));
+        debugLog("CmdAssignObjectAuthorityToClient received; " + " found authMan:" + authMan);
+        authMan.AssignClientAuthority(connectionToClient);
     }
 
     // run on the server
@@ -222,8 +239,11 @@ public class Actor : NetworkBehaviour {
     void CmdRemoveObjectAuthorityFromClient(NetworkIdentity netID)
     {
         debugLog("CmdRemoveObjectAuthorityFromClient received");
-        NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
-        test.RemoveClientAuthority(connectionToClient);
+        //NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
+        //test.RemoveClientAuthority(connectionToClient);
+
+        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netId));
+        authMan.AssignClientAuthority(connectionToClient);
     }
     //*******************************
 }

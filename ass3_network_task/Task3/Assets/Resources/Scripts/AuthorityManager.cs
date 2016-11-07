@@ -38,23 +38,31 @@ public class AuthorityManager : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
+        netID = gameObject.GetComponent<NetworkIdentity>();
 
-       
-	}
+        Debug.Log("initialized AuthorityManager: netId: " + netID);
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
 
     }
 
+    public NetworkIdentity GetNetworkIdentity()
+    {
+        return netID;
+    }
+
     // assign localActor here
     public void AssignActor(Actor actor)
     {
-        
+        localActor = actor;
     }
 
     // should only be called on server (by an Actor)
     // assign the authority over this game object to a client with NetworkConnection conn
+    [Server]
     public void AssignClientAuthority(NetworkConnection conn)
     {
        
@@ -62,9 +70,22 @@ public class AuthorityManager : NetworkBehaviour {
 
     // should only be called on server (by an Actor)
     // remove the authority over this game object from a client with NetworkConnection conn
+    [Server]
     public void RemoveClientAuthority(NetworkConnection conn)
     {
        
+    }
+
+    private void debugLog(string msg)
+    {
+        //Debug.Log("Log - actor: " + prefabName + " isServer: " + isServer + " isLocalPlayer: " + isLocalPlayer + " Msg: " + msg);
+        Debug.Log("Log - authMan, netId: " + netID + "; isServer: " + isServer + "; Msg: " + msg);
+    }
+
+    public void GrabObject()
+    {
+
+        localActor.RequestObjectAuthority(netID);
     }
 
 }
