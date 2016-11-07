@@ -24,16 +24,16 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 	}
 
     // called first time when the GO gets grabbed by a player
-    public void OnGrabbed()
+    public void OnGrabbed(Transform test)
     {
-       
+        transform.SetParent(test);
        
     }
 
     // called when the GO gets released by a player
     public void OnReleased()
     {
-        
+        transform.SetParent(null);
 
     }
 }
