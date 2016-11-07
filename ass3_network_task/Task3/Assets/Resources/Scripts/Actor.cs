@@ -20,6 +20,7 @@ public class Actor : NetworkBehaviour {
     protected virtual void Awake()
     {
         transform = base.transform;
+        sharedObjects = new List<NetworkIdentity>();
     }
 
     // Use this for initialization
@@ -33,22 +34,37 @@ public class Actor : NetworkBehaviour {
                 LocalPlayerController.Singleton.SetActor(this);
                 CmdInitialize(prefabName);
             }
-         
+
+            //TODO objects should be same on server/client anyways - no?
+            foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+            {
+                NetworkIdentity identitySharedObject = curr.GetComponent<NetworkIdentity>();
+
+                sharedObjects.Add(identitySharedObject);
+            }
 
             //this part is for object sharing
             //*******************************
             if (isServer)
             {
+                Debug.Log("Actor name: " + prefabName + " , is SERVER");
                 // find objects that can be manipulated 
+              
+
                 // TIPP : you can use a specific tag for all GO's that can be manipulated by players
+
+
             }
             if (isLocalPlayer) 
             {
+                Debug.Log("Actor name: " + prefabName + " , is LOCAL PLAYER");
                 // find objects that can be manipulated 
+
                 // assign this Actor to the localActor field of the AuthorityManager component of each shared object
             }
             //*******************************
 
+            debugLog("initialized - sharedObjsCount: " +sharedObjects.Count);
         }
         else
         {
@@ -58,9 +74,19 @@ public class Actor : NetworkBehaviour {
 
     }
 
+    private void debugLog(string msg)
+    {
+        //Debug.Log("Log - actor: " + prefabName + " isServer: " + isServer + " isLocalPlayer: " + isLocalPlayer + " Msg: " + msg);
+        Debug.Log("Log - actor: " + prefabName + "; isServer: " + isServer + "; Msg: " + msg);
+    }
+
     public void Update()
     {
- 
+
+        //DEBUG
+        if(Input.GetKeyDown(KeyCode.Space)){
+            debugLog("Pressed space bar");
+        }
     }
 
     /// <summary>
@@ -168,22 +194,26 @@ public class Actor : NetworkBehaviour {
     // ask the server for the authority over an object with NetworkIdentity netID
     public void RequestObjectAuthority(NetworkIdentity netID)
     {
-        
+        debugLog("RequestObjectAuthority...");
     }
 
     // should only be run on localPlayer (by the AuthorityManager of a shared object)
     // ask the server to remove the authority over an object with NetworkIdentity netID
     public void ReturnObjectAuthority(NetworkIdentity netID)
     {
-           
+        debugLog("ReturnObjectAuthority...");
     }
+
 
     // run on the server
     // netID is NetworkIdentity of a shared object the authority if which should be passed to the client
     [Command]
     void CmdAssignObjectAuthorityToClient(NetworkIdentity netID)
     {
-       
+
+        debugLog("CmdAssignObjectAuthorityToClient received");
+        NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
+        test.AssignClientAuthority(connectionToClient);
     }
 
     // run on the server
@@ -191,7 +221,9 @@ public class Actor : NetworkBehaviour {
     [Command]
     void CmdRemoveObjectAuthorityFromClient(NetworkIdentity netID)
     {
-       
+        debugLog("CmdRemoveObjectAuthorityFromClient received");
+        NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
+        test.RemoveClientAuthority(connectionToClient);
     }
     //*******************************
 }
