@@ -15,7 +15,7 @@ public class TouchLeft : MonoBehaviour {
 	void OnTriggerEnter(Collider other)
 	{
 		GameObject playerController = GameObject.Find ("PlayerController");
-		AuthorityManager am = other.gameObject.Find ("AuthorityManager");
+		AuthorityManager am = other.gameObject.GetComponent<AuthorityManager>();
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();

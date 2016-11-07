@@ -46,7 +46,7 @@ public class AuthorityManager : NetworkBehaviour
         onb = gameObject.AddComponent<OnGrabbedBehaviour>();
         authRequestConnections = new System.Collections.Generic.Queue<NetworkConnection>();
 
-        debugLog("initialized AuthorityManager: netId: " + netID);
+        debugLog("initialized AuthorityManager!");
 
     }
 
@@ -77,7 +77,7 @@ public class AuthorityManager : NetworkBehaviour
     [Server]
     public void AssignClientAuthority(NetworkConnection conn)
     {
-
+        
 
         debugLog("AssignClientAuthority...");
         if (netID.localPlayerAuthority
