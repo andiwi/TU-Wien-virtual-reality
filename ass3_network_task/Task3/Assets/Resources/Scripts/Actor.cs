@@ -53,7 +53,6 @@ public class Actor : NetworkBehaviour {
 
                 // TIPP : you can use a specific tag for all GO's that can be manipulated by players
 
-
             }
             if (isLocalPlayer) 
             {
@@ -83,17 +82,34 @@ public class Actor : NetworkBehaviour {
     private void debugLog(string msg)
     {
         //Debug.Log("Log - actor: " + prefabName + " isServer: " + isServer + " isLocalPlayer: " + isLocalPlayer + " Msg: " + msg);
-        Debug.Log("Log - actor: " + prefabName + "; isServer: " + isServer + "; Msg: " + msg);
+        if (isServer)
+        {
+            Debug.Log("Actor: " + prefabName + "; SERVER: "  + msg);
+        }
+        else
+        {
+            Debug.Log("Actor: " + prefabName + "; CLIENT: " + msg);
+        }
+       
     }
 
     public void Update()
     {
 
-        //DEBUG
+        //DEBUG TODO remove
         if(Input.GetKeyDown(KeyCode.Space)){
             debugLog("Pressed space bar");
 
-            
+            //test grab first object
+            sharedObjects[0].GrabObject();
+            //NetworkIdentity test1 = sharedObjects[0].GetNetworkIdentity();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            debugLog("Pressed F");
+
+            sharedObjects[0].UnGrabObject();
         }
     }
 
@@ -223,13 +239,26 @@ public class Actor : NetworkBehaviour {
     [Command]
     void CmdAssignObjectAuthorityToClient(NetworkIdentity netID)
     {
+        debugLog("CmdAssignObjectAuthorityToClient received, " + netID);
 
-      
         //NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
         //test.AssignClientAuthority(connectionToClient);
 
-        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netId));
-        debugLog("CmdAssignObjectAuthorityToClient received; " + " found authMan:" + authMan);
+        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netID)); 
+
+        //foreach (AuthorityManager curr in sharedObjects){
+
+        //    debugLog("checking netId: " + netID + " vs netIdCurr: " + curr.GetNetworkIdentity());
+
+        //    if (curr.GetNetworkIdentity().Equals(netID))
+        //    {
+        //        //netID.
+        //        debugLog("CmdAssignObjectAuthorityToClient: " + " found authMan:" + curr);
+        //        curr.AssignClientAuthority(connectionToClient);
+        //    }
+        //}
+
+        //debugLog("CmdAssignObjectAuthorityToClient: " + " found authMan:" + authMan);
         authMan.AssignClientAuthority(connectionToClient);
     }
 
@@ -242,8 +271,8 @@ public class Actor : NetworkBehaviour {
         //NetworkIdentity test = sharedObjects.Find(curr => curr.Equals(netId));
         //test.RemoveClientAuthority(connectionToClient);
 
-        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netId));
-        authMan.AssignClientAuthority(connectionToClient);
+        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netID));
+        authMan.RemoveClientAuthority(connectionToClient);
     }
     //*******************************
 }
