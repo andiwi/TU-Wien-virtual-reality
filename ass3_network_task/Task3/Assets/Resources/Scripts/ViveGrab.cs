@@ -29,7 +29,8 @@ public class ViveGrab : MonoBehaviour {
 	 
         if(leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown)
         {
-            // notify AuthorityManager that grab conditions are fulfilled
+			Debug.Log ("TOUCHING");
+			// notify AuthorityManager that grab conditions are fulfilled
         }
         else
         {
@@ -37,4 +38,20 @@ public class ViveGrab : MonoBehaviour {
         }
 
     }
+
+	public void SetLeftTriggerDown(bool leftTriggerDown) {
+		this.leftTriggerDown = leftTriggerDown;
+	}
+
+	public void SetRightTriggerDown(bool rightTriggerDown) {
+		this.rightTriggerDown = rightTriggerDown;
+	}
+
+	public void SetLeftHandTouching(bool leftHandTouching) {
+		this.leftHandTouching = leftHandTouching;
+	}
+
+	public void SetRightHandTouching(bool rightHandTouching) {
+		this.rightHandTouching = rightHandTouching;
+	}
 }
