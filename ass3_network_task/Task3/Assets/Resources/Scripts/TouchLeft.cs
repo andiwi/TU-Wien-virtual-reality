@@ -12,17 +12,21 @@ public class TouchLeft : MonoBehaviour {
     public bool vive;
     public bool leap;
 
-	void OnTriggerEnter()
+	void OnTriggerEnter(Collider other)
 	{
 		GameObject playerController = GameObject.Find ("PlayerController");
+		AuthorityManager am = other.gameObject.Find ("AuthorityManager");
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
 			viveGrab.SetLeftHandTouching(true);
+			viveGrab.SetAuthorityManagerLeft (am);
+
 		} else if(leap)
 		{
 			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
 			leapGrab.SetLeftHandTouching(true);
+			leapGrab.SetAuthorityManagerLeft (am);
 		}
 	}
 
@@ -32,11 +36,14 @@ public class TouchLeft : MonoBehaviour {
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
-			viveGrab.SetLeftHandTouching(true);
+			viveGrab.SetLeftHandTouching(false);
+			viveGrab.SetAuthorityManagerLeft (null);
+
 		} else if(leap)
 		{
 			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
 			leapGrab.SetLeftHandTouching(false);
+			leapGrab.SetAuthorityManagerLeft (null);
 		}
 	}
 

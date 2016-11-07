@@ -7,8 +7,8 @@ using System.Collections;
 
 public class ViveGrab : MonoBehaviour {
 
-    AuthorityManager am; // to communicate the fulfillment of grabbing conditions
-
+    AuthorityManager am_left; // to communicate the fulfillment of grabbing conditions
+	AuthorityManager am_right;
    
 
     // conditions for the object control here
@@ -27,7 +27,7 @@ public class ViveGrab : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	 
-        if(leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown)
+		if(leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown && am_left.Equals(am_right))
         {
 			Debug.Log ("TOUCHING");
 			// notify AuthorityManager that grab conditions are fulfilled
@@ -53,5 +53,13 @@ public class ViveGrab : MonoBehaviour {
 
 	public void SetRightHandTouching(bool rightHandTouching) {
 		this.rightHandTouching = rightHandTouching;
+	}
+
+	public void SetAuthorityManagerLeft(AuthorityManager am) {
+		this.am_left = am;
+	}
+
+	public void SetAuthorityManagerRight(AuthorityManager am) {
+		this.am_right = am;
 	}
 }

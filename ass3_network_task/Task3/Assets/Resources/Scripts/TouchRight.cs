@@ -12,17 +12,20 @@ public class TouchRight : MonoBehaviour {
     public bool vive;
     public bool leap;
 
-	void OnTriggerEnter()
+	void OnTriggerEnter(Collider other)
 	{
 		GameObject playerController = GameObject.Find ("PlayerController");
+		AuthorityManager am = other.gameObject.Find ("AuthorityManager");
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
 			viveGrab.SetRightHandTouching(true);
+			viveGrab.SetAuthorityManagerRight (am);
 		} else if(leap)
 		{
 			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
 			leapGrab.SetRightHandTouching(true);
+			leapGrab.SetAuthorityManagerRight (am);
 		}
 	}
 
@@ -32,11 +35,14 @@ public class TouchRight : MonoBehaviour {
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
-			viveGrab.SetRightHandTouching(true);
+			viveGrab.SetRightHandTouching(false);
+			viveGrab.SetAuthorityManagerRight (null);
+
 		} else if(leap)
 		{
 			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
 			leapGrab.SetRightHandTouching(false);
+			leapGrab.SetAuthorityManagerRight (null);
 		}
 	}
 }

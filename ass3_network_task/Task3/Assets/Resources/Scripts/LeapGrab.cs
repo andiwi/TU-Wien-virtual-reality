@@ -7,7 +7,8 @@ using System.Collections;
 
 public class LeapGrab : MonoBehaviour {
 
-    AuthorityManager am;
+    AuthorityManager am_left;
+	AuthorityManager am_right;
 
     // conditions for the object control here
     bool leftHandTouching = false;
@@ -22,7 +23,7 @@ public class LeapGrab : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (leftHandTouching && rightHandTouching && leftPinch && rightPinch)
+		if (leftHandTouching && rightHandTouching && leftPinch && rightPinch && am_left.Equals(am_right))
         {
 			Debug.Log ("TOUCHING");
             // notify AuthorityManager that grab conditions are fulfilled
@@ -55,5 +56,13 @@ public class LeapGrab : MonoBehaviour {
 
 	public void SetRightHandTouching(bool rightHandTouching) {
 		this.rightHandTouching = rightHandTouching;
+	}
+
+	public void SetAuthorityManagerLeft(AuthorityManager am) {
+		this.am_left = am;
+	}
+
+	public void SetAuthorityManagerRight(AuthorityManager am) {
+		this.am_right = am;
 	}
 }
