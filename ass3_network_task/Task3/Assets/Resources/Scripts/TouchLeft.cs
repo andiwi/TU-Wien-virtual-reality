@@ -15,6 +15,10 @@ public class TouchLeft : MonoBehaviour {
 	void OnTriggerEnter(Collider other)
 	{
 		GameObject playerController = GameObject.Find ("PlayerController");
+		if (playerController == null) {
+			return;
+		}
+
 		AuthorityManager am = other.gameObject.GetComponent<AuthorityManager>();
 
 		if (vive) {
@@ -33,6 +37,9 @@ public class TouchLeft : MonoBehaviour {
 	void OnTriggerExit()
 	{
 		GameObject playerController = GameObject.Find ("PlayerController");
+		if (playerController == null) {
+			return;
+		}
 
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
