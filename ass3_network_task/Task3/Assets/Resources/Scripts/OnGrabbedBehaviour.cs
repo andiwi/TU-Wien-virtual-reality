@@ -78,28 +78,25 @@ public class OnGrabbedBehaviour : MonoBehaviour
         if (grabbed)
         {
             Debug.Log ("grabbed");
-            if (leap)
-            {
+			if (leap) {
 
-                if (pinchDetectorR == null || pinchDetectorL == null)
-                {
-                    setupLeapDetectors();
-                }
+				if (pinchDetectorR == null || pinchDetectorL == null) {
+					setupLeapDetectors ();
+				}
 
-                //netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
-				netTrans.transform.position = pinchDetectorL.Position;
+				netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f + new Vector3 (0, 0, 0.2f);
+				Debug.Log ("LEAP");
+			} else if (vive) {
 
-            }
-            else if (vive)
-            {
+				if (pinchDetectorR == null || pinchDetectorL == null) {
+					setupViveDetectors ();
+				}
 
-                if (pinchDetectorR == null || pinchDetectorL == null)
-                {
-                    setupViveDetectors();
-                }
-
-                netTrans.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
-            }
+				netTrans.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
+				Debug.Log ("VIVE");
+			} else {
+				Debug.Log ("SONST WO?");
+			}
         }
     }
 
