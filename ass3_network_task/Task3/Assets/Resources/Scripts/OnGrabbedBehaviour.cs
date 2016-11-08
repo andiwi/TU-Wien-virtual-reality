@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Leap.Unity;
-
+using UnityEngine.Networking;
 // TODO: define the behaviour of a shared object when it is manipulated by a client
 
 public class OnGrabbedBehaviour : MonoBehaviour {
@@ -19,9 +19,12 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 	private GameObject controllerL;
 	private GameObject controllerR;
 
+    NetworkTransform netTrans;
+
     // Use this for initialization
     void Start () {
 		GameObject capsuleHand_L = GameObject.Find("CapsuleHand_L");
+
 		if (capsuleHand_L != null) {
 			leap = true;
 			vive = false;
@@ -40,7 +43,10 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 				controllerR = GameObject.Find ("Controller (right)");
 			}
 		}
-	}
+
+        netTrans = gameObject.GetComponent<NetworkTransform>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -50,9 +56,12 @@ public class OnGrabbedBehaviour : MonoBehaviour {
         {
 			Debug.Log ("grabbed");
 			if (leap) {
-				transform.parent.gameObject.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
-			} else if (vive) {
-				transform.parent.gameObject.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
+                //gameObject.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
+
+                netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
+
+            } else if (vive) {
+                netTrans.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
 			}
         }
 	}
