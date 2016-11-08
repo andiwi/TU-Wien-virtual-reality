@@ -17,12 +17,16 @@ public class TouchRight : MonoBehaviour
 
     void Start()
     {
-        thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
+        //thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
 
     }
 
     void OnTriggerEnter(Collider other)
     {
+        if (thisActor == null)
+        {
+            thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
+        }
         if (thisActor.isLocalPlayer == false) return;
 
         GameObject playerController = GameObject.Find("PlayerController");
@@ -51,6 +55,10 @@ public class TouchRight : MonoBehaviour
 
     void OnTriggerExit()
     {
+        if (thisActor == null)
+        {
+            thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
+        }
         if (thisActor.isLocalPlayer == false) return;
 
         GameObject playerController = GameObject.Find("PlayerController");
