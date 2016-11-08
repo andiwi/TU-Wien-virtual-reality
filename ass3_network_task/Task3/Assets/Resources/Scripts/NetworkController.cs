@@ -53,30 +53,7 @@ public class NetworkController : NetworkManager
         //GameObject model = (GameObject)Instantiate(modelPrefab, new Vector3(0.252f,1.037f,-0.17f), transform.rotation) as GameObject;
         //NetworkServer.Spawn(model);
 
-        if (!host)
-        {
-            GameObject servCamObj = GameObject.Find("ServerCamera");
-
-            if (servCamObj != null)
-            {
-                Camera camera = GameObject.Find("ServerCamera").GetComponent<Camera>();
-                camera.enabled = true;
-            }
-            else
-            {
-                Debug.Log("ServerCamera not found :/");
-            }
-
-
-            foreach (GameObject curr in GameObject.FindGameObjectsWithTag("Player"))
-            {
-                Camera cam = curr.GetComponent<Camera>();
-                if (cam != null)
-                {
-                    cam.enabled = false;
-                }
-            }
-        }
+        setupHostOrServer();
 
     }
 
@@ -85,7 +62,7 @@ public class NetworkController : NetworkManager
         Debug.Log("OnStartHost()");
         host = true;
         base.OnStartHost();
-       
+
     }
 
     public override void OnStartClient(NetworkClient client)
@@ -96,6 +73,45 @@ public class NetworkController : NetworkManager
 
 
     }
+
+    /// <summary>
+    /// deactivates or activates PlayerController if host/server and ServerCamera
+    /// </summary>
+    private void setupHostOrServer()
+    {
+        if (host)
+        {
+            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
+            if (playerCtrl != null)
+            {
+                playerCtrl.SetActive(true);
+
+            }
+
+            GameObject servCamObj = GameObject.Find("ServerCamera");
+
+            if (servCamObj != null)
+            {
+                Camera camera = servCamObj.GetComponent<Camera>();
+                camera.enabled = false;
+            }
+            else
+            {
+                Debug.Log("ServerCamera not found :/");
+            }
+
+        }
+        else
+        {
+            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
+            if (playerCtrl != null)
+            {
+                playerCtrl.SetActive(false);
+                Debug.Log("deactivate playerCtrl because isServer");
+            }
+        }
+    }
+
 
 }
 

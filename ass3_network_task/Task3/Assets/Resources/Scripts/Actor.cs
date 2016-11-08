@@ -63,6 +63,8 @@ public class Actor : NetworkBehaviour
                     sharedObjects.Add(authObj);
                 }
             }
+
+
             //*******************************
 
             debugLog("initialized - sharedObjsCount: " + sharedObjects.Count);
@@ -73,6 +75,43 @@ public class Actor : NetworkBehaviour
             Initialize(prefabName);
         }
 
+        setupHostOrServer();
+
+    }
+
+    private void setupHostOrServer()
+    {
+        if (IsHost())
+        {
+            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
+            if (playerCtrl != null)
+            {
+                playerCtrl.SetActive(true);
+                
+            }
+
+            GameObject servCamObj = GameObject.Find("ServerCamera");
+
+            if (servCamObj != null)
+            {
+                Camera camera = servCamObj.GetComponent<Camera>();
+                camera.enabled = false;
+            }
+            else
+            {
+                Debug.Log("ServerCamera not found :/");
+            }
+
+        }
+        else if (isServer)
+        {
+            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
+            if (playerCtrl != null)
+            {
+                playerCtrl.SetActive(false);
+                Debug.Log("deactivate playerCtrl because isServer");
+            }
+        }
     }
 
     public bool IsHost()
