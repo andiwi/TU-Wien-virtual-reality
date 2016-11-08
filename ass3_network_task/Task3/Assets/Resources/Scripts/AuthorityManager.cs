@@ -68,8 +68,21 @@ public class AuthorityManager : NetworkBehaviour
     }
 
     private bool hasConnectionAuthority(NetworkConnection con)
-    {    
+    {
         return con.Equals(netID.clientAuthorityOwner);
+    }
+
+    [ClientRpc]
+    public void RpcGrabObject()
+    {
+
+        onb.OnGrabbed();
+    }
+    [ClientRpc]
+    public void RpcReleaseObject()
+    {
+
+        onb.OnReleased();
     }
 
     // should only be called on server (by an Actor)
@@ -78,7 +91,6 @@ public class AuthorityManager : NetworkBehaviour
     public void AssignClientAuthority(NetworkConnection conn)
     {
         //bool host parameter
-
 
         debugLog("AssignClientAuthority..." + conn);
         if (netID.localPlayerAuthority
@@ -93,6 +105,7 @@ public class AuthorityManager : NetworkBehaviour
             netID.localPlayerAuthority = true; //TODO why??
             netID.AssignClientAuthority(conn);
             debugLog("granting localPlayerAuthority!");
+            RpcGrabObject();
         }
         else
         {
@@ -113,9 +126,12 @@ public class AuthorityManager : NetworkBehaviour
             debugLog("has no connection authority to remove..");
             return;
         }
-      
+
+        //in case isLocalPlayer -> host -> don't remove client authority, since not possible
+        //if(!isLocalPlayer)
         netID.RemoveClientAuthority(conn);
         netID.localPlayerAuthority = false;
+        RpcReleaseObject();
 
         if (authRequestConnections.Count > 0)
         {

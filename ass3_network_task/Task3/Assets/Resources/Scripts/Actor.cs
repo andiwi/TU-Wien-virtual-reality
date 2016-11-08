@@ -87,7 +87,10 @@ public class Actor : NetworkBehaviour
 
     public void Update()
     {
-
+        if (!isLocalPlayer)
+        {
+            return;
+        }
         //DEBUG TODO remove
         if (Input.GetKeyDown(KeyCode.Space))
         {
