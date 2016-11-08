@@ -27,17 +27,16 @@ public class ViveGrab : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	 
-		if(leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown && am_left.Equals(am_right))
-        {
+		if (leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown && am_left.Equals (am_right)) {
 			Debug.Log ("TOUCHING");
 			am_left.GrabObject ();
 			// notify AuthorityManager that grab conditions are fulfilled
-        }
-		else if(am_left != null)
-        {
-            // grab conditions are not fulfilled
-			am_left.UnGrabObject();
-        }
+		} else if (am_left != null) {
+			// grab conditions are not fulfilled
+			am_left.UnGrabObject ();
+		} else if (am_right != null) {
+			am_right.UnGrabObject ();
+		}
 
     }
 

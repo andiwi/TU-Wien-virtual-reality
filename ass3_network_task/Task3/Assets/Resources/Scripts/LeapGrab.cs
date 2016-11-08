@@ -23,16 +23,15 @@ public class LeapGrab : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (leftHandTouching && rightHandTouching && leftPinch && rightPinch && am_left.Equals(am_right))
-        {
+		if (leftHandTouching && rightHandTouching && leftPinch && rightPinch && am_left.Equals (am_right)) {
 			Debug.Log ("TOUCHING");
-            // notify AuthorityManager that grab conditions are fulfilled
-			am_left.GrabObject();
-        }
-		else if(am_left != null)
-        {
-           // grab conditions are not fulfilled
-			am_left.UnGrabObject();
+			// notify AuthorityManager that grab conditions are fulfilled
+			am_left.GrabObject ();
+		} else if (am_left != null) {
+			// grab conditions are not fulfilled
+			am_left.UnGrabObject ();
+		} else if (am_right != null) {
+			am_right.UnGrabObject ();
 		}
     }
 
