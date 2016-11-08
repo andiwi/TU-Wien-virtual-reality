@@ -16,6 +16,9 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 	private PinchDetector pinchDetectorL;
 	private PinchDetector pinchDetectorR;
 
+	private GameObject controllerL;
+	private GameObject controllerR;
+
     // Use this for initialization
     void Start () {
 		GameObject capsuleHand_L = GameObject.Find("CapsuleHand_L");
@@ -29,14 +32,12 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 			pinchDetectorR = capsuleHand_R.GetComponent<PinchDetector> ();
 
 		} else {
-			GameObject controller_L = GameObject.Find ("Controller (left)");
-			if (controller_L != null) {
+			controllerL = GameObject.Find ("Controller (left)");
+			if (controllerL != null) {
 				leap = false;
 				vive = true;
 
-				GameObject controller_R = GameObject.Find ("Controller (right)");
-
-				//TODO
+				controllerR = GameObject.Find ("Controller (right)");
 			}
 		}
 	}
@@ -51,7 +52,7 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 			if (leap) {
 				transform.parent.gameObject.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
 			} else if (vive) {
-				//TODO
+				transform.parent.gameObject.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
 			}
         }
 	}
