@@ -32,6 +32,10 @@ public class AuthorityManager : NetworkBehaviour
     // TODO: implement a mechanism for storing consequent authority requests from different clients
     // e.g. manage a situation where a client requests authority over an object that is currently being manipulated by another client
 
+    /// <summary>
+    /// Server only variable don't dare to touch it anywhere else
+    /// </summary>
+    bool authorityAssigned;
     System.Collections.Generic.Queue<NetworkConnection> authRequestConnections;
 
     //*****************************************************************************************************
@@ -73,13 +77,13 @@ public class AuthorityManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcGrabObject()
+    public void RpcOnAuthorityAssignedToClient()
     {
         debugLog("RpcGrabObject...");
         onb.OnGrabbed();
     }
     [ClientRpc]
-    public void RpcReleaseObject()
+    public void RpcOnAuthorityReleasedFromClient()
     {
         debugLog("RpcReleaseObject...");
         onb.OnReleased();
@@ -93,19 +97,19 @@ public class AuthorityManager : NetworkBehaviour
         //bool host parameter
 
         debugLog("AssignClientAuthority..." + conn);
-        if (netID.localPlayerAuthority
+        if (authorityAssigned
             && hasConnectionAuthority(conn) == false
             && authRequestConnections.Contains(conn) == false)
         {
             debugLog("localPlayerAuthority already granted & not in Queue -> adding to Queue.");
             authRequestConnections.Enqueue(conn);
         }
-        else if (netID.localPlayerAuthority == false)
+        else if (authorityAssigned == false)
         {
-            netID.localPlayerAuthority = true; //TODO why??
+            authorityAssigned = true;
             netID.AssignClientAuthority(conn);
             debugLog("granting localPlayerAuthority!");
-            RpcGrabObject();
+            RpcOnAuthorityAssignedToClient();
         }
         else
         {
@@ -128,10 +132,10 @@ public class AuthorityManager : NetworkBehaviour
         }
 
         //in case isLocalPlayer -> host -> don't remove client authority, since not possible
-        //if(!isLocalPlayer)
+
         netID.RemoveClientAuthority(conn);
-        netID.localPlayerAuthority = false;
-        RpcReleaseObject();
+        authorityAssigned = false;
+        RpcOnAuthorityReleasedFromClient();
 
         if (authRequestConnections.Count > 0)
         {
@@ -149,13 +153,14 @@ public class AuthorityManager : NetworkBehaviour
 
     public void GrabObject()
     {
-
-        localActor.RequestObjectAuthority(netID);
+        if (onb.IsGrabbed() == false)
+            localActor.RequestObjectAuthority(netID);
     }
 
     public void UnGrabObject()
     {
-        localActor.ReturnObjectAuthority(netID);
+        if (onb.IsGrabbed() == true)
+            localActor.ReturnObjectAuthority(netID);
     }
 
 }

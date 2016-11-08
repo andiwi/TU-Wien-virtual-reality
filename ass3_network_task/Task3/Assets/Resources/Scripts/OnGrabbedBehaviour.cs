@@ -57,6 +57,11 @@ public class OnGrabbedBehaviour : MonoBehaviour {
         }
 	}
 
+    public bool IsGrabbed()
+    {
+        return grabbed;
+    }
+
     // called first time when the GO gets grabbed by a player
     public void OnGrabbed()
     {
