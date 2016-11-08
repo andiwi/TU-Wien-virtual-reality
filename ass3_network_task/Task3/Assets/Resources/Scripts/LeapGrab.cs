@@ -29,7 +29,7 @@ public class LeapGrab : MonoBehaviour {
             // notify AuthorityManager that grab conditions are fulfilled
 			am_left.GrabObject();
         }
-        else
+		else if(am_left != null)
         {
            // grab conditions are not fulfilled
 			am_left.UnGrabObject();
