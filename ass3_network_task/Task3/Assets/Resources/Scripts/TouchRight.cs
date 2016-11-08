@@ -63,14 +63,14 @@ public class TouchRight : MonoBehaviour
         {
             ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
             viveGrab.SetRightHandTouching(false);
-            viveGrab.SetAuthorityManagerRight(null);
+			viveGrab.SetAuthorityManagerRightNull();
 
         }
         else if (leap)
         {
             LeapGrab leapGrab = playerController.GetComponent<LeapGrab>();
             leapGrab.SetRightHandTouching(false);
-            leapGrab.SetAuthorityManagerRight(null);
+			leapGrab.SetAuthorityManagerRightNull();
         }
     }
 }
