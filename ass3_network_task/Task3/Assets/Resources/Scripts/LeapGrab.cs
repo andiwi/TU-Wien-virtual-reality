@@ -27,11 +27,13 @@ public class LeapGrab : MonoBehaviour {
         {
 			Debug.Log ("TOUCHING");
             // notify AuthorityManager that grab conditions are fulfilled
+			am_left.GrabObject();
         }
         else
         {
            // grab conditions are not fulfilled
-        }
+			am_left.UnGrabObject();
+		}
     }
 
 	public void SetLeftPinchTrue() {
