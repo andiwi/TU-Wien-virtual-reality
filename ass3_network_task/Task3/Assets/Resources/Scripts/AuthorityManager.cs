@@ -85,15 +85,21 @@ public class AuthorityManager : NetworkBehaviour
     [ClientRpc]
     public void RpcOnAuthorityAssignedToClient()
     {
-        debugLog("RpcGrabObject...");
-        onb.OnGrabbed();
+        if (hasAuthority)
+        {
+            debugLog("RpcGrabObject...");
+            onb.OnGrabbed();
+        }
         rigidbody.isKinematic = true;
     }
     [ClientRpc]
     public void RpcOnAuthorityReleasedFromClient()
     {
-        debugLog("RpcReleaseObject...");
-        onb.OnReleased();
+        if (hasAuthority)
+        {
+            debugLog("RpcReleaseObject...");
+            onb.OnReleased();
+        }
         rigidbody.isKinematic = false;
     }
 
@@ -147,6 +153,8 @@ public class AuthorityManager : NetworkBehaviour
         debugLog("granting localPlayerAuthority!");
         RpcOnAuthorityAssignedToClient();
         rigidbody.isKinematic = true;
+
+        //conn.
     }
 
     // should only be called on server (by an Actor)
