@@ -172,12 +172,13 @@ public class AuthorityManager : NetworkBehaviour
 
         //in case isLocalPlayer -> host -> don't remove client authority, since not possible
 
+        RpcOnAuthorityReleasedFromClient();
+        authorityAssigned = false;
+        rigidbody.isKinematic = false;
+
         bool removed = netID.RemoveClientAuthority(conn);
         if (removed)
         {
-            authorityAssigned = false;
-            RpcOnAuthorityReleasedFromClient();
-            rigidbody.isKinematic = false;
 
             if (authRequestConnections.Count > 0)
             {
