@@ -68,7 +68,7 @@ public class AuthorityManager : NetworkBehaviour
     }
 
     private bool hasConnectionAuthority(NetworkConnection con)
-    {
+    {    
         return con.Equals(netID.clientAuthorityOwner);
     }
 
@@ -77,9 +77,10 @@ public class AuthorityManager : NetworkBehaviour
     [Server]
     public void AssignClientAuthority(NetworkConnection conn)
     {
-        
+        //bool host parameter
 
-        debugLog("AssignClientAuthority...");
+
+        debugLog("AssignClientAuthority..." + conn);
         if (netID.localPlayerAuthority
             && hasConnectionAuthority(conn) == false
             && authRequestConnections.Contains(conn) == false)
@@ -112,10 +113,9 @@ public class AuthorityManager : NetworkBehaviour
             debugLog("has no connection authority to remove..");
             return;
         }
-
-
-        netID.localPlayerAuthority = false;
+      
         netID.RemoveClientAuthority(conn);
+        netID.localPlayerAuthority = false;
 
         if (authRequestConnections.Count > 0)
         {
@@ -127,15 +127,7 @@ public class AuthorityManager : NetworkBehaviour
     private void debugLog(string msg)
     {
         //Debug.Log("Log - actor: " + prefabName + " isServer: " + isServer + " isLocalPlayer: " + isLocalPlayer + " Msg: " + msg);
-        if (isServer)
-        {
-            Debug.Log("AuthManager, netId: " + netID + "; SERVER: " + msg);
-        }
-        else
-        {
-            Debug.Log("AuthManager, netId: " + netID + "; CLIENT: " + msg);
-        }
-
+        Debug.Log("AuthManager-" + gameObject.name + ": " + msg);
     }
 
 
