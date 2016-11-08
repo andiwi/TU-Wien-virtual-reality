@@ -67,9 +67,9 @@ public class OnGrabbedBehaviour : MonoBehaviour
 				Debug.Log ("LEAP");
 			} else if (vive) {
 
-				if (pinchDetectorR == null || pinchDetectorL == null) {
+				if (controllerL == null || controllerR == null) {
 					setupViveDetectors ();
-				}
+                }
 
 				netTrans.transform.position = (controllerL.transform.position + controllerR.transform.position) / 2f;
 				Debug.Log ("VIVE");
