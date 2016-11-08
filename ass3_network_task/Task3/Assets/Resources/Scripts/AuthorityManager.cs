@@ -40,7 +40,6 @@ public class AuthorityManager : NetworkBehaviour
     /// <summary>
     /// don't dare to set this var on the client
     /// </summary>
-    [SyncVar]
     bool authorityAssigned;
     System.Collections.Generic.Queue<NetworkConnection> authRequestConnections;
 
@@ -99,7 +98,7 @@ public class AuthorityManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// for resetting flag that allows to send request... 
+    /// callback to tell the greedy client that he is allowed to make a request again
     /// </summary>
     [ClientRpc]
     public void RpcOnRequestProcessed()
@@ -115,9 +114,7 @@ public class AuthorityManager : NetworkBehaviour
         //bool host parameter
 
         debugLog("AssignClientAuthority..." + conn);
-        if (authorityAssigned
-            && hasConnectionAuthority(conn) == false
-            && authRequestConnections.Contains(conn) == false)
+        if (authRequestQueueConditionCheck(conn))
         {
             debugLog("localPlayerAuthority already granted & not in Queue -> adding to Queue.");
             authRequestConnections.Enqueue(conn);
@@ -132,6 +129,14 @@ public class AuthorityManager : NetworkBehaviour
         }
 
         RpcOnRequestProcessed();
+    }
+
+    [Server]
+    private bool authRequestQueueConditionCheck(NetworkConnection conn)
+    {
+        return authorityAssigned
+                    && hasConnectionAuthority(conn) == false
+                    && authRequestConnections.Contains(conn) == false;
     }
 
     [Server]

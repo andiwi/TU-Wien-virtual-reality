@@ -20,7 +20,6 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 	private GameObject controllerR;
 
     NetworkTransform netTrans;
-    Rigidbody rigidBody;
 
     // Use this for initialization
     void Start () {
@@ -46,7 +45,6 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 		}
 
         netTrans = gameObject.GetComponent<NetworkTransform>();
-        rigidBody = gameObject.GetComponent<Rigidbody>();
 
     }
 	
@@ -61,8 +59,6 @@ public class OnGrabbedBehaviour : MonoBehaviour {
                 //gameObject.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
                 //netTrans.transform.position = gameObject.transform.position;
                 netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
-                //Vector3 newPos = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
-                //rigidBody.MovePosition(rigidBody.position + newPos);
 
             }
             else if (vive) {
@@ -80,13 +76,11 @@ public class OnGrabbedBehaviour : MonoBehaviour {
     public void OnGrabbed()
     {
 		grabbed = true;
-       // rigidBody.isKinematic = true;
     }
 
     // called when the GO gets released by a player
     public void OnReleased()
     {
 		grabbed = false;
-        //rigidBody.isKinematic = false;
     }
 }
