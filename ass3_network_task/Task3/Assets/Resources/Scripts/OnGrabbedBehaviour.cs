@@ -9,8 +9,8 @@ public class OnGrabbedBehaviour : MonoBehaviour
 
 
     bool grabbed;
-    private bool vive;
-    private bool leap;
+    public bool vive;
+    public bool leap;
 
     private GameObject playerController;
 
@@ -22,34 +22,13 @@ public class OnGrabbedBehaviour : MonoBehaviour
 
     NetworkTransform netTrans;
 
-    // Use this for initialization
+
     void Start()
     {
-        GameObject capsuleHand_L = GameObject.Find("CapsuleHand_L");
-
-        if (capsuleHand_L != null)
-        {
-            leap = true;
-            vive = false;
-
-            GameObject capsuleHand_R = GameObject.Find("CapsuleHand_R");
-
-            pinchDetectorL = capsuleHand_L.GetComponent<PinchDetector>();
-
-            if (capsuleHand_R != null) pinchDetectorR = capsuleHand_R.GetComponent<PinchDetector>();
-
-        }
-        else
-        {
-            controllerL = GameObject.Find("Controller (left)");
-            if (controllerL != null)
-            {
-                leap = false;
-                vive = true;
-
-                controllerR = GameObject.Find("Controller (right)");
-            }
-        }
+        if (leap)
+            setupLeapDetectors();
+        else if (vive)
+            setupViveDetectors();
 
         netTrans = gameObject.GetComponent<NetworkTransform>();
 
@@ -70,14 +49,14 @@ public class OnGrabbedBehaviour : MonoBehaviour
         controllerR = GameObject.Find("Controller (right)");
     }
 
-    // Update is called once per frame
+
     void Update()
     {
 
         // GO´s behaviour when it is in a grabbed state (owned by a client) should be defined here
         if (grabbed)
         {
-            Debug.Log ("grabbed");
+            Debug.Log("grabbed");
             if (leap)
             {
 
@@ -87,7 +66,7 @@ public class OnGrabbedBehaviour : MonoBehaviour
                 }
 
                 //netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
-				netTrans.transform.position = pinchDetectorL.Position;
+                netTrans.transform.position = pinchDetectorL.Position;
 
             }
             else if (vive)

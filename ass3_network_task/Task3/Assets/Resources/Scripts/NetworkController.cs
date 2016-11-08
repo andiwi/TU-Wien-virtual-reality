@@ -70,8 +70,6 @@ public class NetworkController : NetworkManager
         Debug.Log("OnStartClient()");
         base.OnStartClient(client);
 
-
-
     }
 
     /// <summary>

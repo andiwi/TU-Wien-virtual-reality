@@ -43,6 +43,7 @@ public class Actor : NetworkBehaviour
 
             if (isLocalPlayer)
             {
+                //CLIENT AND HOST
                 Debug.Log("Actor name: " + prefabName + " , is LOCAL PLAYER (host: " + IsHost() + ")");
                 // find objects that can be manipulated 
                 foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
@@ -55,7 +56,8 @@ public class Actor : NetworkBehaviour
             }
             else if (isServer)
             {
-                Debug.Log("Actor name: " + prefabName + " , is SERVER");
+                //SERVER ONLY
+                Debug.Log("Actor: " + " is DEDICATED SERVER");
                 // find objects that can be manipulated 
                 foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
                 {
@@ -75,11 +77,11 @@ public class Actor : NetworkBehaviour
             Initialize(prefabName);
         }
 
-        setupHostOrServer();
+        setupHost();
 
     }
 
-    private void setupHostOrServer()
+    private void setupHost()
     {
         if (IsHost())
         {
@@ -87,7 +89,7 @@ public class Actor : NetworkBehaviour
             if (playerCtrl != null)
             {
                 playerCtrl.SetActive(true);
-                
+
             }
 
             GameObject servCamObj = GameObject.Find("ServerCamera");
@@ -102,15 +104,6 @@ public class Actor : NetworkBehaviour
                 Debug.Log("ServerCamera not found :/");
             }
 
-        }
-        else if (isServer)
-        {
-            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
-            if (playerCtrl != null)
-            {
-                playerCtrl.SetActive(false);
-                Debug.Log("deactivate playerCtrl because isServer");
-            }
         }
     }
 
@@ -270,7 +263,7 @@ public class Actor : NetworkBehaviour
         //{
         //debugLog("client is HOST -> abort return object authority");
         //}
-       
+
     }
 
 

@@ -117,7 +117,6 @@ public class AuthorityManager : NetworkBehaviour
     [Server]
     public void AssignClientAuthority(NetworkConnection conn)
     {
-        //bool host parameter
 
         debugLog("AssignClientAuthority..." + conn);
         if (authRequestQueueConditionCheck(conn))
@@ -154,7 +153,6 @@ public class AuthorityManager : NetworkBehaviour
         RpcOnAuthorityAssignedToClient();
         rigidbody.isKinematic = true;
 
-        //conn.
     }
 
     // should only be called on server (by an Actor)
@@ -205,7 +203,7 @@ public class AuthorityManager : NetworkBehaviour
     [Client]
     public void GrabObject()
     {
-        debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+        //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
         if (onb.IsGrabbed() == false && requestSent == false)
             localActor.RequestObjectAuthority(netID);
     }
@@ -213,7 +211,7 @@ public class AuthorityManager : NetworkBehaviour
     [Client]
     public void UnGrabObject()
     {
-        debugLog("UnGrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+        // debugLog("UnGrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
         if (onb.IsGrabbed() == true && requestSent == false)
             localActor.ReturnObjectAuthority(netID);
     }
