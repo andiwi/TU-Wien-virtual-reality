@@ -43,7 +43,7 @@ public class AuthorityManager : NetworkBehaviour
     void Start()
     {
         netID = gameObject.GetComponent<NetworkIdentity>();
-        onb = gameObject.AddComponent<OnGrabbedBehaviour>();
+        onb = gameObject.GetComponent<OnGrabbedBehaviour>();
         authRequestConnections = new System.Collections.Generic.Queue<NetworkConnection>();
 
         debugLog("initialized AuthorityManager!");
