@@ -77,7 +77,7 @@ public class OnGrabbedBehaviour : MonoBehaviour
         // GO´s behaviour when it is in a grabbed state (owned by a client) should be defined here
         if (grabbed)
         {
-            //Debug.Log ("grabbed");
+            Debug.Log ("grabbed");
             if (leap)
             {
 
@@ -86,7 +86,8 @@ public class OnGrabbedBehaviour : MonoBehaviour
                     setupLeapDetectors();
                 }
 
-                netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
+                //netTrans.transform.position = (pinchDetectorL.Position + pinchDetectorR.Position) / 2f;
+				netTrans.transform.position = pinchDetectorL.Position;
 
             }
             else if (vive)
