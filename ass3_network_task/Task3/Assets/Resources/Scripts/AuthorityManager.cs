@@ -75,13 +75,13 @@ public class AuthorityManager : NetworkBehaviour
     [ClientRpc]
     public void RpcGrabObject()
     {
-
+        debugLog("RpcGrabObject...");
         onb.OnGrabbed();
     }
     [ClientRpc]
     public void RpcReleaseObject()
     {
-
+        debugLog("RpcReleaseObject...");
         onb.OnReleased();
     }
 
