@@ -64,7 +64,7 @@ public class LeapGrab : MonoBehaviour {
 	}
 
 	public void SetAuthorityManagerLeftNull() {
-		am_left.UnGrabObject ();
+		if(am_left != null) am_left.UnGrabObject ();
 		this.am_left = null;
 	}
 
@@ -73,7 +73,7 @@ public class LeapGrab : MonoBehaviour {
 	}
 
 	public void SetAuthorityManagerRightNull() {
-		am_right.UnGrabObject ();
+		if(am_right != null) am_right.UnGrabObject ();
 		this.am_right = null;
 	}
 }
