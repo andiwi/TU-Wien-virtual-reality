@@ -44,13 +44,13 @@ public class TouchLeft : MonoBehaviour {
 		if (vive) {
 			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
 			viveGrab.SetLeftHandTouching(false);
-			viveGrab.SetAuthorityManagerLeft (null);
+			viveGrab.SetAuthorityManagerLeftNull();
 
 		} else if(leap)
 		{
 			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
 			leapGrab.SetLeftHandTouching(false);
-			leapGrab.SetAuthorityManagerLeft (null);
+			leapGrab.SetAuthorityManagerLeftNull();
 		}
 	}
 
