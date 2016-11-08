@@ -25,6 +25,11 @@ public class AuthorityManager : NetworkBehaviour
                             // this component can implement different functionality for different GO´s
 
 
+
+    //these variables are set up and handled by both client and server
+    Rigidbody rigidbody;
+
+
     //***************************************************************************************************
 
     // these variables should be set up on the server
@@ -33,8 +38,9 @@ public class AuthorityManager : NetworkBehaviour
     // e.g. manage a situation where a client requests authority over an object that is currently being manipulated by another client
 
     /// <summary>
-    /// Server only variable don't dare to touch it anywhere else
+    /// don't dare to set this var on the client
     /// </summary>
+    [SyncVar]
     bool authorityAssigned;
     System.Collections.Generic.Queue<NetworkConnection> authRequestConnections;
 
@@ -49,6 +55,7 @@ public class AuthorityManager : NetworkBehaviour
         netID = gameObject.GetComponent<NetworkIdentity>();
         onb = gameObject.GetComponent<OnGrabbedBehaviour>();
         authRequestConnections = new System.Collections.Generic.Queue<NetworkConnection>();
+        rigidbody = gameObject.GetComponent<Rigidbody>();
 
         debugLog("initialized AuthorityManager!");
 
@@ -81,12 +88,23 @@ public class AuthorityManager : NetworkBehaviour
     {
         debugLog("RpcGrabObject...");
         onb.OnGrabbed();
+        rigidbody.isKinematic = true;
     }
     [ClientRpc]
     public void RpcOnAuthorityReleasedFromClient()
     {
         debugLog("RpcReleaseObject...");
         onb.OnReleased();
+        rigidbody.isKinematic = false;
+    }
+
+    /// <summary>
+    /// for resetting flag that allows to send request... 
+    /// </summary>
+    [ClientRpc]
+    public void RpcOnRequestProcessed()
+    {
+        requestSent = false;
     }
 
     // should only be called on server (by an Actor)
@@ -106,16 +124,24 @@ public class AuthorityManager : NetworkBehaviour
         }
         else if (authorityAssigned == false)
         {
-            authorityAssigned = true;
-            netID.AssignClientAuthority(conn);
-            debugLog("granting localPlayerAuthority!");
-            RpcOnAuthorityAssignedToClient();
+            assignAuthority(conn);
         }
         else
         {
             debugLog("localPlayerAuth already granted -> authRequest dismissed");
         }
 
+        RpcOnRequestProcessed();
+    }
+
+    [Server]
+    private void assignAuthority(NetworkConnection conn)
+    {
+        authorityAssigned = true;
+        netID.AssignClientAuthority(conn);
+        debugLog("granting localPlayerAuthority!");
+        RpcOnAuthorityAssignedToClient();
+        rigidbody.isKinematic = true;
     }
 
     // should only be called on server (by an Actor)
@@ -133,15 +159,25 @@ public class AuthorityManager : NetworkBehaviour
 
         //in case isLocalPlayer -> host -> don't remove client authority, since not possible
 
-        netID.RemoveClientAuthority(conn);
-        authorityAssigned = false;
-        RpcOnAuthorityReleasedFromClient();
-
-        if (authRequestConnections.Count > 0)
+        bool removed = netID.RemoveClientAuthority(conn);
+        if (removed)
         {
-            Debug.Log("authRequest queue is not empty, assign auth on first..");
-            AssignClientAuthority(authRequestConnections.Dequeue());
+            authorityAssigned = false;
+            RpcOnAuthorityReleasedFromClient();
+            rigidbody.isKinematic = false;
+
+            if (authRequestConnections.Count > 0)
+            {
+                Debug.Log("authRequest queue is not empty, assign auth on first..");
+                AssignClientAuthority(authRequestConnections.Dequeue());
+            }
         }
+        else
+        {
+            Debug.Log("ERROR removeClientAuthority false");
+        }
+
+        RpcOnRequestProcessed();
     }
 
     private void debugLog(string msg)
@@ -150,16 +186,21 @@ public class AuthorityManager : NetworkBehaviour
         Debug.Log("AuthManager-" + gameObject.name + ": " + msg);
     }
 
+    private bool requestSent = false;
 
+    [Client]
     public void GrabObject()
     {
-        if (onb.IsGrabbed() == false)
+        debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+        if (onb.IsGrabbed() == false && requestSent == false)
             localActor.RequestObjectAuthority(netID);
     }
 
+    [Client]
     public void UnGrabObject()
     {
-        if (onb.IsGrabbed() == true)
+        debugLog("UnGrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+        if (onb.IsGrabbed() == true && requestSent == false)
             localActor.ReturnObjectAuthority(netID);
     }
 
