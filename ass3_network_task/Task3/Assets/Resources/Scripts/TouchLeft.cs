@@ -7,51 +7,66 @@ using System.Collections;
 // ALTERNATIVELY, implement the verification of the grabbing conditions in a way  your prefer
 // TO REMEMBER: only the localPlayer (networked hands belonging to the localPlayer) should be able to "touch" shared objects
 
-public class TouchLeft : MonoBehaviour {
+public class TouchLeft : MonoBehaviour
+{
 
     public bool vive;
     public bool leap;
+    Actor thisActor;
 
-	void OnTriggerEnter(Collider other)
-	{
-		GameObject playerController = GameObject.Find ("PlayerController");
-		if (playerController == null) {
-			return;
-		}
+    void Start()
+    {
+        thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
 
-		AuthorityManager am = other.gameObject.GetComponent<AuthorityManager>();
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if (thisActor.isLocalPlayer == false) return;
+        GameObject playerController = GameObject.Find("PlayerController");
+        if (playerController == null)
+        {
+            return;
+        }
 
-		if (vive) {
-			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
-			viveGrab.SetLeftHandTouching(true);
-			viveGrab.SetAuthorityManagerLeft (am);
+        AuthorityManager am = other.gameObject.GetComponent<AuthorityManager>();
 
-		} else if(leap)
-		{
-			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
-			leapGrab.SetLeftHandTouching(true);
-			leapGrab.SetAuthorityManagerLeft (am);
-		}
-	}
+        if (vive)
+        {
+            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
+            viveGrab.SetLeftHandTouching(true);
+            viveGrab.SetAuthorityManagerLeft(am);
 
-	void OnTriggerExit()
-	{
-		GameObject playerController = GameObject.Find ("PlayerController");
-		if (playerController == null) {
-			return;
-		}
+        }
+        else if (leap)
+        {
+            LeapGrab leapGrab = playerController.GetComponent<LeapGrab>();
+            leapGrab.SetLeftHandTouching(true);
+            leapGrab.SetAuthorityManagerLeft(am);
+        }
+    }
 
-		if (vive) {
-			ViveGrab viveGrab = playerController.GetComponent<ViveGrab> ();
-			viveGrab.SetLeftHandTouching(false);
-			viveGrab.SetAuthorityManagerLeftNull();
+    void OnTriggerExit()
+    {
+        if (thisActor.isLocalPlayer == false) return;
+        GameObject playerController = GameObject.Find("PlayerController");
+        if (playerController == null)
+        {
+            return;
+        }
 
-		} else if(leap)
-		{
-			LeapGrab leapGrab = playerController.GetComponent<LeapGrab> ();
-			leapGrab.SetLeftHandTouching(false);
-			leapGrab.SetAuthorityManagerLeftNull();
-		}
-	}
+        if (vive)
+        {
+            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
+            viveGrab.SetLeftHandTouching(false);
+            viveGrab.SetAuthorityManagerLeftNull();
+
+        }
+        else if (leap)
+        {
+            LeapGrab leapGrab = playerController.GetComponent<LeapGrab>();
+            leapGrab.SetLeftHandTouching(false);
+            leapGrab.SetAuthorityManagerLeftNull();
+        }
+    }
 
 }
