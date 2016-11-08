@@ -43,7 +43,7 @@ public class OnGrabbedBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+
         // GO´s behaviour when it is in a grabbed state (owned by a client) should be defined here
         if(grabbed)
         {
