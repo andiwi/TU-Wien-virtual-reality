@@ -46,13 +46,15 @@ public class Actor : NetworkBehaviour
                 //CLIENT AND HOST
                 Debug.Log("Actor name: " + prefabName + " , is LOCAL PLAYER (host: " + IsHost() + ")");
                 // find objects that can be manipulated 
-                foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+                //TODO uncomment the for each
+				/*
+				foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
                 {
                     // assign this Actor to the localActor field of the AuthorityManager component of each shared object
                     AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
                     authObj.AssignActor(this);
                     sharedObjects.Add(authObj);
-                }
+                }*/
             }
             else if (isServer)
             {
