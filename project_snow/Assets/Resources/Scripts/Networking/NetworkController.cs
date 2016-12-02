@@ -27,6 +27,7 @@ public class NetworkController : NetworkManager
     private void Start()
     {
         //TODO commented out for NetworkManagerHUD control
+
         //if(server)
         //{
         //    StartServer();
@@ -48,12 +49,7 @@ public class NetworkController : NetworkManager
         Debug.Log("OnStartServer()");
         base.OnStartServer();
 
-        //for spawning the box when server starts (debug)
-        //GameObject modelPrefab = Resources.Load("Prefabs/Box") as GameObject;
-        //GameObject model = (GameObject)Instantiate(modelPrefab, new Vector3(0.252f,1.037f,-0.17f), transform.rotation) as GameObject;
-        //NetworkServer.Spawn(model);
-
-        setupHostOrServer();
+        setServerCameraEnabled(true);
 
     }
 
@@ -67,49 +63,26 @@ public class NetworkController : NetworkManager
 
     public override void OnStartClient(NetworkClient client)
     {
-        Debug.Log("OnStartClient()");
+        Debug.Log("OnStartClient()");     
         base.OnStartClient(client);
 
+        setServerCameraEnabled(false);
     }
 
-    /// <summary>
-    /// deactivates or activates PlayerController if host/server and ServerCamera
-    /// </summary>
-    private void setupHostOrServer()
+    private void setServerCameraEnabled(bool enabled)
     {
-        if (host)
+
+        GameObject servCamObj = GameObject.Find("ServerCamera");
+        if (servCamObj != null)
         {
-            //GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
-            //if (playerCtrl != null)
-            //{
-            //    playerCtrl.SetActive(true);
-
-            //}
-
-            //GameObject servCamObj = GameObject.Find("ServerCamera");
-
-            //if (servCamObj != null)
-            //{
-            //    Camera camera = servCamObj.GetComponent<Camera>();
-            //    camera.enabled = false;
-            //}
-            //else
-            //{
-            //    Debug.Log("ServerCamera not found :/");
-            //}
+            Camera camera = servCamObj.GetComponent<Camera>();
+            camera.enabled = enabled;
 
         }
         else
         {
-            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
-            if (playerCtrl != null)
-            {
-                playerCtrl.SetActive(false);
-                Debug.Log("deactivate playerCtrl because isServer");
-            }
+            Debug.Log("setServerCameraEnabled - ServerCamera not found :/");
         }
     }
-
-
 }
 
