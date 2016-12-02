@@ -79,24 +79,24 @@ public class NetworkController : NetworkManager
     {
         if (host)
         {
-            GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
-            if (playerCtrl != null)
-            {
-                playerCtrl.SetActive(true);
+            //GameObject playerCtrl = GameObject.FindGameObjectWithTag("leapPlayer");
+            //if (playerCtrl != null)
+            //{
+            //    playerCtrl.SetActive(true);
 
-            }
+            //}
 
-            GameObject servCamObj = GameObject.Find("ServerCamera");
+            //GameObject servCamObj = GameObject.Find("ServerCamera");
 
-            if (servCamObj != null)
-            {
-                Camera camera = servCamObj.GetComponent<Camera>();
-                camera.enabled = false;
-            }
-            else
-            {
-                Debug.Log("ServerCamera not found :/");
-            }
+            //if (servCamObj != null)
+            //{
+            //    Camera camera = servCamObj.GetComponent<Camera>();
+            //    camera.enabled = false;
+            //}
+            //else
+            //{
+            //    Debug.Log("ServerCamera not found :/");
+            //}
 
         }
         else
