@@ -107,7 +107,7 @@ public class AuthorityManager : NetworkBehaviour
     /// callback to tell the greedy client that he is allowed to make a request again
     /// </summary>
     [TargetRpc]
-    public void RpcOnRequestProcessed(NetworkConnection target)
+    public void TargetRpcOnRequestProcessed(NetworkConnection target)
     {
         requestSent = false;
     }
@@ -133,7 +133,7 @@ public class AuthorityManager : NetworkBehaviour
             debugLog("localPlayerAuth already granted -> authRequest dismissed");
         }
 
-        RpcOnRequestProcessed(conn);
+        TargetRpcOnRequestProcessed(conn);
     }
 
     [Server]
@@ -189,7 +189,7 @@ public class AuthorityManager : NetworkBehaviour
             Debug.Log("ERROR removeClientAuthority false");
         }
 
-        RpcOnRequestProcessed(conn);
+        TargetRpcOnRequestProcessed(conn);
     }
 
     private void debugLog(string msg)
