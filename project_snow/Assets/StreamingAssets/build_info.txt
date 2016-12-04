@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-Build from ZENBOOK at 12/2/2016 6:26:02 PM
-=======
-Build from WAGI-G-PC at 12/2/2016 4:39:36 PM
->>>>>>> 12c026dda7fd34b1f2b1cdf09db9767851ad2f4f
