@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 /// <summary>
 /// taken and changed from https://github.com/SebLague/Kinematic-Equation-Problems
@@ -11,18 +12,24 @@ public class BallLauncher : MonoBehaviour
     int waitingTime = 1;
 
     public GameObject snowballPrefab;
-    public Transform target;
+    public Transform targetPassed;
 
-    public float h = 25;
+    public float height = 25;
+    public float heightVariation = 10;
     public float gravity = -18;
+
+    public float targetPosVariation = 4;
 
     public bool debugPath;
 
+    GameObject[] players;
+
     void Start()
     {
-       
+        players = GameObject.FindGameObjectsWithTag("Player");
     }
 
+    
     void Update()
     {
 
@@ -31,9 +38,13 @@ public class BallLauncher : MonoBehaviour
         {
             //Action
 
-            GameObject ball = Instantiate(snowballPrefab);         
-            ball.transform.position = transform.position;
-            Launch(ball.GetComponent<Rigidbody>());
+            GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
+            GameObject targetPlayer = SelectPlayer();
+            if(targetPlayer != null)
+            {
+                Launch(ball, targetPlayer.transform);
+            }
+
             timer = 0;
         }
 
@@ -43,18 +54,45 @@ public class BallLauncher : MonoBehaviour
         }
     }
 
-    void Launch(Rigidbody ball)
+    private GameObject SelectPlayer()
+    {
+        if (players == null) return null;
+        int randomIndex = Random.Range(0, players.Length - 1);
+        GameObject targetPlayer = players[randomIndex];
+        return targetPlayer;
+    }
+
+
+    void OnPlayerConnected(NetworkPlayer player)
+    {
+        players = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log("Player " + " connected from " + player.ipAddress + ":" + player.port + "; No of players: " + players.Length);
+    }
+
+    void Launch(GameObject ball, Transform target)
     {
 
         Physics.gravity = Vector3.up * gravity;
-        ball.useGravity = true;
-        ball.velocity = CalculateLaunchData(ball).initialVelocity;
+        Rigidbody ballRigid = ball.GetComponent<Rigidbody>();
+        ballRigid.useGravity = true;
+        ballRigid.velocity = CalculateLaunchData(ballRigid, target).initialVelocity;
+
+        NetworkServer.Spawn(ball);
+
+        Destroy(ball, 10.0f);
     }
 
-    LaunchData CalculateLaunchData(Rigidbody ball)
+    LaunchData CalculateLaunchData(Rigidbody ball, Transform target)
     {
+        //height variation
+        float h = Random.Range(height- heightVariation, height+ heightVariation);
+
         float displacementY = target.position.y - ball.position.y;
         Vector3 displacementXZ = new Vector3(target.position.x - ball.position.x, 0, target.position.z - ball.position.z);
+
+        //position variation 
+        displacementXZ += new Vector3(Random.Range(-targetPosVariation, targetPosVariation), Random.Range(-targetPosVariation, targetPosVariation));
+
         float time = Mathf.Sqrt(-2 * h / gravity) + Mathf.Sqrt(2 * (displacementY - h) / gravity);
         Vector3 velocityY = Vector3.up * Mathf.Sqrt(-2 * gravity * h);
         Vector3 velocityXZ = displacementXZ / time;

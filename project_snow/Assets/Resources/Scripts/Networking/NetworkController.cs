@@ -8,6 +8,7 @@ public class NetworkController : NetworkManager
 
     public bool host;
     public bool server;
+    public Camera serverCamera;
 
     public static NetworkController FindInstance()
     {
@@ -26,6 +27,7 @@ public class NetworkController : NetworkManager
     /// </summary>
     private void Start()
     {
+
         //TODO commented out for NetworkManagerHUD control
 
         //if(server)
@@ -72,16 +74,14 @@ public class NetworkController : NetworkManager
     private void setServerCameraEnabled(bool enabled)
     {
 
-        GameObject servCamObj = GameObject.Find("ServerCamera");
-        if (servCamObj != null)
+        if (serverCamera != null)
         {
-            Camera camera = servCamObj.GetComponent<Camera>();
-            camera.enabled = enabled;
+            serverCamera.enabled = enabled;
 
         }
         else
         {
-            Debug.Log("setServerCameraEnabled - ServerCamera not found :/");
+            Debug.Log("setServerCameraEnabled - no serverCamera defined!");
         }
     }
 }
