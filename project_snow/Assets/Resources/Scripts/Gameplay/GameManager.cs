@@ -18,6 +18,8 @@ public class GameManager : NetworkBehaviour
 
     GameObject[] players;
 
+    public Actor localActor { get; set; }
+
     //public GameObject[] players { get; private set; }
 
     void Start()

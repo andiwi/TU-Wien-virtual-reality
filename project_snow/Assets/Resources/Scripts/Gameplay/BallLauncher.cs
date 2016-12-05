@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 /// <summary>
 /// taken and changed from https://github.com/SebLague/Kinematic-Equation-Problems
 /// </summary>
-public class BallLauncher : MonoBehaviour
+public class BallLauncher : NetworkBehaviour
 {
 
     float timer;
@@ -20,10 +20,10 @@ public class BallLauncher : MonoBehaviour
 
     public float targetPosVariation = 4;
 
-    public bool debugPath;
-    
+
     void Update()
     {
+        if (isServer == false) { return; }
 
         timer += Time.deltaTime;
         if (timer > waitingTime)
@@ -32,7 +32,7 @@ public class BallLauncher : MonoBehaviour
 
             GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
             GameObject targetPlayer = SelectPlayer();
-            if(targetPlayer != null)
+            if (targetPlayer != null)
             {
                 Launch(ball, targetPlayer.transform);
             }
@@ -40,15 +40,12 @@ public class BallLauncher : MonoBehaviour
             timer = 0;
         }
 
-        if (debugPath)
-        {
-            DrawPath();
-        }
     }
 
+    [Server]
     private GameObject SelectPlayer()
     {
-     
+
         //GameObject[] players = GameManager.Instance.GetPlayers();
 
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -57,15 +54,13 @@ public class BallLauncher : MonoBehaviour
         if (players == null) return null;
         int randomIndex = Random.Range(0, players.Length);
 
-        //Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
+        Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
 
         GameObject targetPlayer = players[randomIndex];
         return targetPlayer;
     }
 
-
-
-
+    [Server]
     void Launch(GameObject ball, Transform target)
     {
 
@@ -75,15 +70,31 @@ public class BallLauncher : MonoBehaviour
         ballRigid.velocity = CalculateLaunchData(ballRigid, target).initialVelocity;
 
         NetworkServer.Spawn(ball);
+        RpcInitBallAuthManClients(ball);
 
         //Destroy(ball, 10.0f);
-        //NetworkServer.Destroy(ball);
+        //NetworkServer.Destroy(ball);  
     }
+
+    [ClientRpc]
+    public void RpcInitBallAuthManClients(GameObject ball)
+    {  
+        AuthorityManager ballAuthMan = ball.GetComponent<AuthorityManager>();
+        if (ballAuthMan == null)
+        {
+            Debug.Log("ERROR RpcInitBallAuthManClients - ballAuthMan == null");
+            return;
+        }
+        Actor clientActor = GameManager.Instance.localActor;
+        Debug.Log("RpcInitBallAuthManClients - assigned localActor: " + clientActor);
+        ballAuthMan.AssignActor(clientActor);
+    }
+
 
     LaunchData CalculateLaunchData(Rigidbody ball, Transform target)
     {
         //height variation
-        float h = Random.Range(height- heightVariation, height+ heightVariation);
+        float h = Random.Range(height - heightVariation, height + heightVariation);
 
         float displacementY = target.position.y - ball.position.y;
         Vector3 displacementXZ = new Vector3(target.position.x - ball.position.x, 0, target.position.z - ball.position.z);
@@ -98,21 +109,6 @@ public class BallLauncher : MonoBehaviour
         return new LaunchData(velocityXZ + velocityY * -Mathf.Sign(gravity), time);
     }
 
-    void DrawPath()
-    {
-        //LaunchData launchData = CalculateLaunchData();
-        //Vector3 previousDrawPoint = ball.position;
-
-        //int resolution = 30;
-        //for (int i = 1; i <= resolution; i++)
-        //{
-        //    float simulationTime = i / (float)resolution * launchData.timeToTarget;
-        //    Vector3 displacement = launchData.initialVelocity * simulationTime + Vector3.up * gravity * simulationTime * simulationTime / 2f;
-        //    Vector3 drawPoint = ball.position + displacement;
-        //    Debug.DrawLine(previousDrawPoint, drawPoint, Color.green);
-        //    previousDrawPoint = drawPoint;
-        //}
-    }
 
     struct LaunchData
     {

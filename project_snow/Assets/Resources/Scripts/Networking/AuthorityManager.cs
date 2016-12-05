@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
-
+using System.Collections.Generic;
 
 // TODO: this script should manage authority for a shared object
 public class AuthorityManager : NetworkBehaviour
@@ -88,10 +88,12 @@ public class AuthorityManager : NetworkBehaviour
         if (hasAuthority)
         {
             debugLog("RpcGrabObject...");
-            onb.OnGrabbed();
+            onb.OnGrabbed(localActor.gameObject.transform);
         }
         rigidbody.isKinematic = true;
+        grabbed = true;
     }
+
     [ClientRpc]
     public void RpcOnAuthorityReleasedFromClient()
     {
@@ -101,6 +103,7 @@ public class AuthorityManager : NetworkBehaviour
             onb.OnReleased();
         }
         rigidbody.isKinematic = false;
+        grabbed = false;
     }
 
     /// <summary>
@@ -200,20 +203,83 @@ public class AuthorityManager : NetworkBehaviour
 
     private bool requestSent = false;
 
+
+    [Client]
+    public void GrabObject(Transform parent)
+    {
+        //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+        if (grabbed == false) {
+        
+            if (hasAuthority)
+            {
+                debugLog("GrabObject - client already has authority -> grab object!");
+
+
+            } else if (requestSent == false)
+            {
+                debugLog("GrabObject - client has no authority -> request authority");
+                localActor.RequestObjectAuthority(netID);
+            }
+        }
+    }
+
+
     [Client]
     public void GrabObject()
     {
         //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
-        if (onb.IsGrabbed() == false && requestSent == false)
+
+
+
+        if (grabbed == false && requestSent == false)
+        {
             localActor.RequestObjectAuthority(netID);
+        }
+
+        //task3
+        //if (onb.IsGrabbed() == false && requestSent == false)
+        //    localActor.RequestObjectAuthority(netID);
+    }
+
+    /// <summary>
+    /// for debugging - keep authority when throwing for now 
+    /// </summary>
+    [Client]
+    public void UnGrabObjectButKeepAuthority()
+    {
+        debugLog("UnGrabObjectButKeepAuthority - isGrabbed? "+grabbed);
+
+        if (grabbed == true)
+        {
+            onb.OnReleased();
+            grabbed = false;
+        }
     }
 
     [Client]
     public void UnGrabObject()
     {
         // debugLog("UnGrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
-        if (onb.IsGrabbed() == true && requestSent == false)
-            localActor.ReturnObjectAuthority(netID);
+
+        if (grabbed == true && requestSent == false)
+        {
+            localActor.RequestObjectAuthority(netID);
+        }
+
+
+        //Task3
+        //if (onb.IsGrabbed() == true && requestSent == false)
+        //    localActor.ReturnObjectAuthority(netID);
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        Debug.Log("OnStartLocalPlayer() ");
+        List<PlayerController> playerCtrls = NetworkController.FindInstance().client.connection.playerControllers;
+
+        Debug.Log("playerCtrls: " + playerCtrls.Count +  " pls " + playerCtrls);
+
+
     }
 
 }
