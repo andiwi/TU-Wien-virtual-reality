@@ -1,25 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 /// <summary>
-/// Game Manager Singleton object (game state)
+/// Game Manager 
 /// </summary>
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     private static GameManager _instance;
-
     public static GameManager Instance { get { return _instance; } }
-
 
     private void Awake()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
+        _instance = this;
+
     }
+
+    GameObject[] players;
+
+    //public GameObject[] players { get; private set; }
+
+    void Start()
+    {
+        players = GameObject.FindGameObjectsWithTag("Player");
+    }
+
+    public GameObject[] GetPlayers()
+    {
+        return players;
+    }
+
+    public void CmdOnPlayerConnectedCallback()
+    {
+        players = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log("Player connected; No of players: " + players.Length);
+    }
+
 }
+

@@ -9,7 +9,7 @@ public class BallLauncher : MonoBehaviour
 {
 
     float timer;
-    int waitingTime = 1;
+    public int waitingTime = 1;
 
     public GameObject snowballPrefab;
     public Transform targetPassed;
@@ -21,14 +21,6 @@ public class BallLauncher : MonoBehaviour
     public float targetPosVariation = 4;
 
     public bool debugPath;
-
-    GameObject[] players;
-
-    void Start()
-    {
-        players = GameObject.FindGameObjectsWithTag("Player");
-    }
-
     
     void Update()
     {
@@ -56,18 +48,23 @@ public class BallLauncher : MonoBehaviour
 
     private GameObject SelectPlayer()
     {
+     
+        //GameObject[] players = GameManager.Instance.GetPlayers();
+
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //TODO rework or just use one target anyways
+
         if (players == null) return null;
-        int randomIndex = Random.Range(0, players.Length - 1);
+        int randomIndex = Random.Range(0, players.Length);
+
+        //Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
+
         GameObject targetPlayer = players[randomIndex];
         return targetPlayer;
     }
 
 
-    void OnPlayerConnected(NetworkPlayer player)
-    {
-        players = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log("Player " + " connected from " + player.ipAddress + ":" + player.port + "; No of players: " + players.Length);
-    }
+
 
     void Launch(GameObject ball, Transform target)
     {
@@ -79,7 +76,8 @@ public class BallLauncher : MonoBehaviour
 
         NetworkServer.Spawn(ball);
 
-        Destroy(ball, 10.0f);
+        //Destroy(ball, 10.0f);
+        //NetworkServer.Destroy(ball);
     }
 
     LaunchData CalculateLaunchData(Rigidbody ball, Transform target)
