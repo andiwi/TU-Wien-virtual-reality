@@ -9,6 +9,7 @@ public class ViveControllerTrigger : MonoBehaviour {
 
 	SteamVR_TrackedController controller;
 	private ViveGrab viveGrab;
+    private ViveSnowBallControl snowBallCtrl;
 
 	// Use this for initialization
 	void Start () {
