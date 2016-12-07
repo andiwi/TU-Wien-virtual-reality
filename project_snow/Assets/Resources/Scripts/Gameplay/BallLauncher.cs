@@ -10,6 +10,8 @@ public class BallLauncher : NetworkBehaviour
 
     float timer;
     public int waitingTime = 1;
+    public int ballLivingTime = 10;
+
 
     public GameObject snowballPrefab;
     public Transform targetPassed;
@@ -34,6 +36,7 @@ public class BallLauncher : NetworkBehaviour
             GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
+                Debug.Log("instantiated ball: " +ball.name);
                 Launch(ball, targetPlayer.transform);
             }
 
@@ -41,6 +44,8 @@ public class BallLauncher : NetworkBehaviour
         }
 
     }
+
+
 
     [Server]
     private GameObject SelectPlayer()
@@ -72,13 +77,20 @@ public class BallLauncher : NetworkBehaviour
         NetworkServer.Spawn(ball);
         RpcInitBallAuthManClients(ball);
 
-        //Destroy(ball, 10.0f);
-        //NetworkServer.Destroy(ball);  
+        StartCoroutine(WaitAndDestroyBall(ball));
+    }
+
+    private IEnumerator WaitAndDestroyBall(GameObject ball)
+    {
+        yield return new WaitForSeconds(ballLivingTime);
+        NetworkServer.Destroy(ball);
+        Destroy(ball);
+        Debug.Log("waited and destroyed ball " + ball.name); 
     }
 
     [ClientRpc]
     public void RpcInitBallAuthManClients(GameObject ball)
-    {  
+    {
         AuthorityManager ballAuthMan = ball.GetComponent<AuthorityManager>();
         if (ballAuthMan == null)
         {
