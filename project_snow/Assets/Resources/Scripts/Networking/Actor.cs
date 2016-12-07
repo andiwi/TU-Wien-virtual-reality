@@ -201,7 +201,6 @@ public class Actor : NetworkBehaviour
         GameObject modelPrefab = Resources.Load("Prefabs/" + prefab) as GameObject;
         GameObject model = (GameObject)Instantiate(modelPrefab, transform.position, transform.rotation) as GameObject;
         NetworkServer.Spawn(model);
-        GameManager.Instance.CmdOnPlayerConnectedCallback();
         // Attach character to player
         AttachCharacter(model.GetComponent<Character>());
     }
