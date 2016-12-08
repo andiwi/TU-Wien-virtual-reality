@@ -51,10 +51,10 @@ public class BallLauncher : NetworkBehaviour
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         //TODO rework or just use one target anyways
 
-        if (players == null) return null;
+		if (players == null || players.Length == 0) return null;
         int randomIndex = Random.Range(0, players.Length);
 
-        Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
+        //Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
 
         GameObject targetPlayer = players[randomIndex];
         return targetPlayer;
@@ -69,8 +69,9 @@ public class BallLauncher : NetworkBehaviour
         ballRigid.useGravity = true;
         ballRigid.velocity = CalculateLaunchData(ballRigid, target).initialVelocity;
 
+
         NetworkServer.Spawn(ball);
-        RpcInitBallAuthManClients(ball);
+        //RpcInitBallAuthManClients(ball); //TODO why?
 
         //Destroy(ball, 10.0f);
         //NetworkServer.Destroy(ball);  
@@ -79,6 +80,10 @@ public class BallLauncher : NetworkBehaviour
     [ClientRpc]
     public void RpcInitBallAuthManClients(GameObject ball)
     {  
+		Debug.Log (ball);
+		if (ball == null) {
+			Debug.Log ("ball is null");
+		}
         AuthorityManager ballAuthMan = ball.GetComponent<AuthorityManager>();
         if (ballAuthMan == null)
         {

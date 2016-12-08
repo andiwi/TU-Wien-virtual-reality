@@ -56,7 +56,7 @@ public class AuthorityManager : NetworkBehaviour
         authRequestConnections = new System.Collections.Generic.Queue<NetworkConnection>();
         rigidbody = gameObject.GetComponent<Rigidbody>();
 
-        debugLog("initialized AuthorityManager!");
+        //debugLog("initialized AuthorityManager!");
 
     }
 

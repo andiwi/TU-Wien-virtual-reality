@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class EnemySpawner : MonoBehaviour
+public class EnemySpawner : NetworkBehaviour
 {
 
     public GameObject enemyPrefab;
@@ -21,9 +21,11 @@ public class EnemySpawner : MonoBehaviour
 
     public void Start()
     {
-        SpawnEnemies();
+		if (isServer) {
+			SpawnEnemies ();
+		}
     }
-
+		
     public void SpawnEnemies()
     {
         for (int i = 0; i < enemyCount; i++)
@@ -34,7 +36,7 @@ public class EnemySpawner : MonoBehaviour
 
         Debug.Log("SpawnEnemies() executed");
     }
-
+		
     private GameObject createEnemy()
     {
         float x = Random.Range(MinX, MaxX);
@@ -43,4 +45,10 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemy = Instantiate(enemyPrefab, new Vector3(x, y, z), Quaternion.identity) as GameObject;
         return enemy;
     }
+
+	public void RemoveEnemy(GameObject enemy) {
+		if(isServer) {
+			NetworkServer.Destroy (enemy);
+		}
+	}
 }
