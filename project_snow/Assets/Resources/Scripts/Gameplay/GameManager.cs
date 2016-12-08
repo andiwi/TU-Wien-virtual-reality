@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 public class GameManager : NetworkBehaviour
 {
 	private int playerLife = 100;
+	private GUIText gameStatus;
 
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
@@ -27,6 +28,8 @@ public class GameManager : NetworkBehaviour
     void Start()
     {
         players = GameObject.FindGameObjectsWithTag("Player");
+		gameStatus = this.GetComponentInChildren<GUIText> ();
+		gameStatus.text = "Life: " + playerLife;
     }
 
     public GameObject[] GetPlayers()
@@ -40,13 +43,25 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Player connected; No of players: " + players.Length);
     }
 
-	public void hitByEnemySnowball() {
+	public void HitByEnemySnowball() {
 		if (!isServer) {
 			return;
 		}
 
 		playerLife -= 10;
-		Debug.Log (playerLife);
+		if (playerLife > 0) {
+			gameStatus.text = "Life: " + playerLife;
+		} else {
+			GameOver ();
+		}
+	}
+
+	public void GameOver() {
+		if (!isServer) {
+			return;
+		}
+
+		gameStatus.text = "GAME OVER!";
 	}
 
 }
