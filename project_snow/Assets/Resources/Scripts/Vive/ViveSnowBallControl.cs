@@ -16,7 +16,7 @@ public class ViveSnowBallControl : MonoBehaviour
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
-        idlePulseEnumerator = PulseVibration(10000, 0.15f, 0.5f, 0.05f);
+        idlePulseEnumerator = PulseVibration(10000, 0.25f, 0.5f, 0.1f);
     }
 
     // Update is called once per frame
@@ -41,7 +41,7 @@ public class ViveSnowBallControl : MonoBehaviour
             {
                 Debug.Log("You have collided with " + collider.name + " while holding down Touch");
 
-                colAuthMan.GrabObject(gameObject.transform);
+                colAuthMan.GrabObject();
 
                 //collider.attachedRigidbody.isKinematic = true;  
                 //collider.gameObject.transform.SetParent(gameObject.transform);
@@ -49,10 +49,10 @@ public class ViveSnowBallControl : MonoBehaviour
             if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
             {
                 Debug.Log("You have released Touch while colliding with " + collider.name);
-                collider.gameObject.transform.SetParent(null);
-                collider.attachedRigidbody.isKinematic = false;
+                //collider.gameObject.transform.SetParent(null);
+                //collider.attachedRigidbody.isKinematic = false;
 
-                colAuthMan.UnGrabObjectButKeepAuthority();
+                colAuthMan.UnGrabObject();
                 ThrowSnowball(collider.attachedRigidbody);
             }
 
@@ -83,13 +83,19 @@ public class ViveSnowBallControl : MonoBehaviour
 
     void StartIdlePulse()
     {
-        StartCoroutine(idlePulseEnumerator);
-        idlePulsing = true;
+        if (idlePulsing == false)
+        {
+            StartCoroutine(idlePulseEnumerator);
+            idlePulsing = true;
+        }
     }
     void StopIdlePulse()
     {
-        StopCoroutine(idlePulseEnumerator);
-        idlePulsing = false;
+        if(idlePulsing == true)
+        {
+            StopCoroutine(idlePulseEnumerator);
+            idlePulsing = false;
+        }
     }
 
     public void RumbleController(float duration, float strength)

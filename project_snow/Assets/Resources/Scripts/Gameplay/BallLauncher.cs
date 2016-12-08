@@ -31,11 +31,11 @@ public class BallLauncher : NetworkBehaviour
         if (timer > waitingTime)
         {
             //Action
-
-            GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
+      
             GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
+                GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
                 Debug.Log("instantiated ball: " +ball.name);
                 Launch(ball, targetPlayer.transform);
             }
@@ -56,10 +56,10 @@ public class BallLauncher : NetworkBehaviour
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         //TODO rework or just use one target anyways
 
-        if (players == null) return null;
+        if (players == null || players.Length == 0) return null;
         int randomIndex = Random.Range(0, players.Length);
 
-        Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
+        //Debug.Log("SelectPlayer: " + players.Length + " , sel index:" + randomIndex);
 
         GameObject targetPlayer = players[randomIndex];
         return targetPlayer;
@@ -85,7 +85,7 @@ public class BallLauncher : NetworkBehaviour
         yield return new WaitForSeconds(ballLivingTime);
         NetworkServer.Destroy(ball);
         Destroy(ball);
-        Debug.Log("waited and destroyed ball " + ball.name); 
+        //Debug.Log("waited and destroyed ball " + ball.name); 
     }
 
     [ClientRpc]
@@ -98,7 +98,7 @@ public class BallLauncher : NetworkBehaviour
             return;
         }
         Actor clientActor = GameManager.Instance.localActor;
-        Debug.Log("RpcInitBallAuthManClients - assigned localActor: " + clientActor);
+        //Debug.Log("RpcInitBallAuthManClients - assigned localActor: " + clientActor);
         ballAuthMan.AssignActor(clientActor);
     }
 

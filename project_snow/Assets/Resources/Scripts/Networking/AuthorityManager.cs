@@ -8,7 +8,7 @@ public class AuthorityManager : NetworkBehaviour
 {
 
 
-    NetworkIdentity netID; // NetworkIdentity component attached to this game object
+    NetworkIdentity netIDgameObj; // NetworkIdentity component attached to this game object
 
     // these variables should be set up on a client
     //**************************************************************************************************
@@ -51,27 +51,28 @@ public class AuthorityManager : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
-        netID = gameObject.GetComponent<NetworkIdentity>();
+        netIDgameObj = gameObject.GetComponent<NetworkIdentity>();
         onb = gameObject.GetComponent<OnGrabbedBehaviour>();
         authRequestConnections = new System.Collections.Generic.Queue<NetworkConnection>();
         rigidbody = gameObject.GetComponent<Rigidbody>();
+
+        if (isClient)
+        {
+            GameManager gameMan = GameManager.Instance;
+            if (gameMan && gameMan.localActor)
+            {
+                localActor = gameMan.localActor;
+            }
+        }
 
         debugLog("initialized AuthorityManager!");
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-    }
-
-    public NetworkIdentity GetNetworkIdentity()
-    {
-        return netID;
-    }
-
-    // assign localActor here
+    /// <summary>
+    ///    assign localActor here 
+    /// </summary>
     public void AssignActor(Actor actor)
     {
         localActor = actor;
@@ -79,31 +80,56 @@ public class AuthorityManager : NetworkBehaviour
 
     private bool hasConnectionAuthority(NetworkConnection con)
     {
-        return con.Equals(netID.clientAuthorityOwner);
+        return con.Equals(netIDgameObj.clientAuthorityOwner);
     }
 
+    /// <summary>
+    /// all clients callback
+    /// </summary>
     [ClientRpc]
     public void RpcOnAuthorityAssignedToClient()
     {
-        if (hasAuthority)
-        {
-            debugLog("RpcGrabObject...");
-            onb.OnGrabbed(localActor.gameObject.transform);
-        }
+        //if (hasAuthority)
+        //{
+        //    debugLog("RpcGrabObject...");
+        //    onb.OnGrabbed(localActor.gameObject.transform);
+        //    grabbed = true;
+        //    //EventManager.OnAuthorityAssigned();
+        //}
         rigidbody.isKinematic = true;
+
+    }
+
+    [TargetRpc]
+    public void TargetRpcOnAuthorityAssigned(NetworkConnection target)
+    {
+        //no hasAuthority abfrage since it might be delayed
+        debugLog("TargetRpcOnAuthorityAssigned...");
+        onb.OnGrabbed(getLocalActor().gameObject.transform);
         grabbed = true;
+        //rigidbody.isKinematic = true;  //TODO check if isKimenatic is necessary
+    }
+
+    [TargetRpc]
+    public void TargetRpcOnAuthorityReleased(NetworkConnection target)
+    {
+        //no hasAuthority abfrage since it might be delayed
+        debugLog("TargetRpcOnAuthorityAssigned...");
+        onb.OnReleased();
+        grabbed = false;
+        //rigidbody.isKinematic = false;  //TODO check if isKimenatic is necessary
     }
 
     [ClientRpc]
     public void RpcOnAuthorityReleasedFromClient()
     {
-        if (hasAuthority)
-        {
-            debugLog("RpcReleaseObject...");
-            onb.OnReleased();
-        }
+        //if (hasAuthority)
+        //{
+        //    debugLog("RpcReleaseObject...");
+        //    onb.OnReleased();
+        //}
         rigidbody.isKinematic = false;
-        grabbed = false;
+        //grabbed = false;
     }
 
     /// <summary>
@@ -151,7 +177,7 @@ public class AuthorityManager : NetworkBehaviour
     private void assignAuthority(NetworkConnection conn)
     {
         authorityAssigned = true;
-        netID.AssignClientAuthority(conn);
+        netIDgameObj.AssignClientAuthority(conn);
         debugLog("granting localPlayerAuthority!");
         RpcOnAuthorityAssignedToClient();
         rigidbody.isKinematic = true;
@@ -177,7 +203,7 @@ public class AuthorityManager : NetworkBehaviour
         authorityAssigned = false;
         rigidbody.isKinematic = false;
 
-        bool removed = netID.RemoveClientAuthority(conn);
+        bool removed = netIDgameObj.RemoveClientAuthority(conn);
         if (removed)
         {
 
@@ -203,43 +229,59 @@ public class AuthorityManager : NetworkBehaviour
 
     private bool requestSent = false;
 
-
     [Client]
-    public void GrabObject(Transform parent)
+    private Actor getLocalActor()
     {
-        //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
-        if (grabbed == false) {
-        
-            if (hasAuthority)
-            {
-                debugLog("GrabObject - client already has authority -> grab object!");
-
-
-            } else if (requestSent == false)
-            {
-                debugLog("GrabObject - client has no authority -> request authority");
-                localActor.RequestObjectAuthority(netID);
-            }
+        if (localActor == null)
+        {
+            localActor = GameManager.Instance.localActor;
+            return localActor;
+        }
+        else
+        {
+            return localActor;
         }
     }
-
 
     [Client]
     public void GrabObject()
     {
         //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
-
-
-
-        if (grabbed == false && requestSent == false)
+        if (grabbed == false)
         {
-            localActor.RequestObjectAuthority(netID);
-        }
 
-        //task3
-        //if (onb.IsGrabbed() == false && requestSent == false)
-        //    localActor.RequestObjectAuthority(netID);
+            if (hasAuthority)
+            {
+
+                debugLog("GrabObject - client already has authority -> grab object!");
+                onb.OnGrabbed(getLocalActor().gameObject.transform);
+
+            }
+            else if (requestSent == false)
+            {
+                debugLog("GrabObject - client has no authority -> request authority");
+
+                getLocalActor().RequestObjectAuthority(netIDgameObj);
+                requestSent = true;
+            }
+        }
     }
+
+
+    //[Client]
+    //public void GrabObject()
+    //{
+    //    //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
+
+    //    if (grabbed == false && requestSent == false)
+    //    {
+    //        localActor.RequestObjectAuthority(netIDgameObj);
+    //    }
+
+    //    //task3
+    //    //if (onb.IsGrabbed() == false && requestSent == false)
+    //    //    localActor.RequestObjectAuthority(netID);
+    //}
 
     /// <summary>
     /// for debugging - keep authority when throwing for now 
@@ -247,7 +289,7 @@ public class AuthorityManager : NetworkBehaviour
     [Client]
     public void UnGrabObjectButKeepAuthority()
     {
-        debugLog("UnGrabObjectButKeepAuthority - isGrabbed? "+grabbed);
+        debugLog("UnGrabObjectButKeepAuthority - isGrabbed? " + grabbed);
 
         if (grabbed == true)
         {
@@ -263,7 +305,8 @@ public class AuthorityManager : NetworkBehaviour
 
         if (grabbed == true && requestSent == false)
         {
-            localActor.RequestObjectAuthority(netID);
+            getLocalActor().ReturnObjectAuthority(netIDgameObj);
+            requestSent = true;
         }
 
 
@@ -277,9 +320,7 @@ public class AuthorityManager : NetworkBehaviour
         Debug.Log("OnStartLocalPlayer() ");
         List<PlayerController> playerCtrls = NetworkController.FindInstance().client.connection.playerControllers;
 
-        Debug.Log("playerCtrls: " + playerCtrls.Count +  " pls " + playerCtrls);
-
-
+        Debug.Log("playerCtrls: " + playerCtrls.Count + " pls " + playerCtrls);
     }
 
 }

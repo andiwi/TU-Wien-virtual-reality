@@ -8,15 +8,16 @@ public class ViveControllerTrigger : MonoBehaviour {
 	public bool rightController;
 
 	SteamVR_TrackedController controller;
-	private ViveGrab viveGrab;
+	//private ViveGrab viveGrab;
     private ViveSnowBallControl snowBallCtrl;
 
 	// Use this for initialization
 	void Start () {
 		controller = GetComponent<SteamVR_TrackedController>();
 
-		GameObject playerController = GameObject.Find ("PlayerController");
-		viveGrab = playerController.GetComponent<ViveGrab> ();
+        //GameObject playerController = GameObject.Find ("PlayerController");
+        //viveGrab = playerController.GetComponent<ViveGrab> ();
+        snowBallCtrl = GetComponent<ViveSnowBallControl>();
 
 		controller.TriggerClicked += new ClickedEventHandler(SetTriggerClicked);
 		controller.TriggerUnclicked += new ClickedEventHandler(SetTriggerUnclicked);
@@ -28,19 +29,23 @@ public class ViveControllerTrigger : MonoBehaviour {
 	}
 
 	private void SetTriggerClicked(object sender, ClickedEventArgs e) {
-		if (leftController) {
-			viveGrab.SetLeftTriggerDown (true);
-		} else if (rightController) {
-			viveGrab.SetRightTriggerDown (true);
-		}
+        //if (leftController) {
+        //	viveGrab.SetLeftTriggerDown (true);
+        //} else if (rightController) {
+        //	viveGrab.SetRightTriggerDown (true);
+        //}
+
+        print("SetTriggerClicked ");
 
 	}
 
 	private void SetTriggerUnclicked(object sender, ClickedEventArgs e) {
-		if (leftController) {
-			viveGrab.SetLeftTriggerDown (false);
-		} else if (rightController) {
-			viveGrab.SetRightTriggerDown (false);
-		}
-	}
+        //if (leftController) {
+        //	viveGrab.SetLeftTriggerDown (false);
+        //} else if (rightController) {
+        //	viveGrab.SetRightTriggerDown (false);
+        //}
+
+        print("SetTriggerUnclicked ");
+    }
 }

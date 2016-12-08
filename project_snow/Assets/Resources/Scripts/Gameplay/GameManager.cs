@@ -24,6 +24,9 @@ public class GameManager : NetworkBehaviour
 
     void Start()
     {
+
+        Debug.Log("GameManager startet: isClient: " + isClient+ " isServer: " + isServer  +" isLocalPalyer:" +isLocalPlayer );
+
         players = GameObject.FindGameObjectsWithTag("Player");
     }
 
