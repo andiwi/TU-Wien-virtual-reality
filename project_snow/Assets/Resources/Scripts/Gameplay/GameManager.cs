@@ -7,7 +7,12 @@ using UnityEngine.Networking;
 /// </summary>
 public class GameManager : NetworkBehaviour
 {
+	[SyncVar]
 	private int playerLife = 100;
+
+	[SyncVar]
+	private int enemiesAlive = 0;
+
 	private GUIText gameStatus;
 
     private static GameManager _instance;
@@ -48,21 +53,49 @@ public class GameManager : NetworkBehaviour
 			return;
 		}
 
-		playerLife -= 10;
-		if (playerLife > 0) {
-			gameStatus.text = "Life: " + playerLife;
-		} else {
-			GameOver ();
-		}
+		updateGameStatus (playerLife, enemiesAlive);
+		RpcUpdateStatus (playerLife, enemiesAlive);
 	}
 
-	public void GameOver() {
-		if (!isServer) {
-			return;
-		}
-
+	private void gameOver() {
 		gameStatus.text = "GAME OVER!";
 	}
 
+	private void gameWin() {
+		gameStatus.text = "YOU WON!";
+	}
+
+	private void updateGameStatus(int playerLife, int enemiesAlive) {
+		if (enemiesAlive == 0) {
+			gameWin ();
+		} else {
+			if (playerLife > 0) {
+				gameStatus.text = "Life: " + playerLife;
+			} else {
+				gameOver ();
+			}
+		}
+	}
+
+	[ClientRpc]
+	public void RpcUpdateStatus(int playerLife, int enemiesAlive) {
+		updateGameStatus (playerLife, enemiesAlive);
+	}
+
+	public void IncreaseEnemiesAlive() {
+		if (!isServer) {
+			return;
+		}
+		enemiesAlive++;
+	}
+
+	public void DecreaseEnemiesAlive() {
+		if (!isServer) {
+			return;
+		}
+		enemiesAlive--;
+		updateGameStatus (playerLife, enemiesAlive);
+		RpcUpdateStatus (playerLife, enemiesAlive);
+	}
 }
 

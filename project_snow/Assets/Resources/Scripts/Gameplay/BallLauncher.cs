@@ -11,6 +11,7 @@ public class BallLauncher : NetworkBehaviour
     float timer;
     public int waitingTime = 1;
 
+	public GameObject snowballContainer;
     public GameObject snowballPrefab;
     public Transform targetPassed;
 
@@ -20,6 +21,11 @@ public class BallLauncher : NetworkBehaviour
 
     public float targetPosVariation = 4;
 
+	void Start() {
+		if (snowballContainer == null) {
+			snowballContainer = GameObject.Find ("Snowballs");
+		}
+	}
 
     void Update()
     {
@@ -33,7 +39,8 @@ public class BallLauncher : NetworkBehaviour
 			position.y += 1.5f;
             //GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
 			GameObject ball = Instantiate(snowballPrefab, position, Quaternion.identity) as GameObject;
-            GameObject targetPlayer = SelectPlayer();
+			ball.transform.parent = snowballContainer.transform;
+			GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
                 Launch(ball, targetPlayer.transform);

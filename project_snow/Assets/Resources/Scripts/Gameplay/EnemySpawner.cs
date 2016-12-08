@@ -5,9 +5,11 @@ using UnityEngine.Networking;
 
 public class EnemySpawner : NetworkBehaviour
 {
-
+	public GameObject enemiesContainer;
     public GameObject enemyPrefab;
     //public Transform enemySpawnPoint;
+
+	private GameManager gameManager;
 
     // private List<GameObject> enemies;
 
@@ -22,6 +24,7 @@ public class EnemySpawner : NetworkBehaviour
     public void Start()
     {
 		if (isServer) {
+			gameManager = this.GetComponent<GameManager> ();
 			SpawnEnemies ();
 		}
     }
@@ -34,7 +37,7 @@ public class EnemySpawner : NetworkBehaviour
             NetworkServer.Spawn(currEnemy);
         }
 
-        Debug.Log("SpawnEnemies() executed");
+        //Debug.Log("SpawnEnemies() executed");
     }
 		
     private GameObject createEnemy()
@@ -43,12 +46,16 @@ public class EnemySpawner : NetworkBehaviour
         float z = Random.Range(MinZ, MaxZ);
 
         GameObject enemy = Instantiate(enemyPrefab, new Vector3(x, y, z), Quaternion.identity) as GameObject;
+		enemy.transform.parent = enemiesContainer.transform;
+
+		gameManager.IncreaseEnemiesAlive ();
         return enemy;
     }
 
 	public void RemoveEnemy(GameObject enemy) {
 		if(isServer) {
 			NetworkServer.Destroy (enemy);
+			gameManager.DecreaseEnemiesAlive ();
 		}
 	}
 }
