@@ -18,11 +18,9 @@ public class LocalPlayerController : MonoBehaviour {
 
         // Initialize locally to update on all clients
         Actor actorPrefab = (Resources.Load("Prefabs/" + actor.name.Replace("(Clone)", "")) as GameObject).GetComponent<Actor>();
-		//TODO REMOVE THIS Actor actorPrefab = (Resources.Load("Prefabs/LeapPlayer") as GameObject).GetComponent<Actor>();
 		actor.transform.SetParent(transform);
 
         var prefabName = "";
-        
         prefabName = actorPrefab.character != null ? actorPrefab.character.name : "";
 
         actor.Initialize(prefabName);

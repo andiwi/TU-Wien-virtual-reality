@@ -48,6 +48,7 @@ public class Actor : NetworkBehaviour
                 // find objects that can be manipulated 
                 //TODO uncomment the for each
 
+				/*
                 GameManager.Instance.localActor = this;
 				
 				foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
@@ -57,17 +58,20 @@ public class Actor : NetworkBehaviour
                     authObj.AssignActor(this);
                     sharedObjects.Add(authObj);
                 }
+                */
             }
             else if (isServer)
             {
                 //SERVER ONLY
                 Debug.Log("Actor: " + " is DEDICATED SERVER");
                 // find objects that can be manipulated 
-                foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+                /*
+				foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
                 {
                     AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
                     sharedObjects.Add(authObj);
                 }
+                */
             }
 
 
@@ -201,7 +205,10 @@ public class Actor : NetworkBehaviour
         GameObject modelPrefab = Resources.Load("Prefabs/" + prefab) as GameObject;
         GameObject model = (GameObject)Instantiate(modelPrefab, transform.position, transform.rotation) as GameObject;
         NetworkServer.Spawn(model);
-        GameManager.Instance.CmdOnPlayerConnectedCallback();
+
+		Debug.Log (prefab);
+
+        //GameManager.Instance.CmdOnPlayerConnectedCallback();
         // Attach character to player
         AttachCharacter(model.GetComponent<Character>());
     }
