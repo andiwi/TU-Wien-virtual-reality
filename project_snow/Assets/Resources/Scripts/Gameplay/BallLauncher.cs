@@ -29,8 +29,10 @@ public class BallLauncher : NetworkBehaviour
         if (timer > waitingTime)
         {
             //Action
-
-            GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
+			Vector3 position = transform.position;
+			position.y += 1.5f;
+            //GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
+			GameObject ball = Instantiate(snowballPrefab, position, Quaternion.identity) as GameObject;
             GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
@@ -68,13 +70,10 @@ public class BallLauncher : NetworkBehaviour
         Rigidbody ballRigid = ball.GetComponent<Rigidbody>();
         ballRigid.useGravity = true;
         ballRigid.velocity = CalculateLaunchData(ballRigid, target).initialVelocity;
+		//ballRigid.velocity = new Vector3 (0, 30, 20);
+		//Debug.Log (ballRigid.velocity);
 
-
-        NetworkServer.Spawn(ball);
-        //RpcInitBallAuthManClients(ball); //TODO why?
-
-        //Destroy(ball, 10.0f);
-        //NetworkServer.Destroy(ball);  
+        NetworkServer.Spawn(ball); 
     }
 
     [ClientRpc]

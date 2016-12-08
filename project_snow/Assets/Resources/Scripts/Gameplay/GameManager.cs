@@ -7,6 +7,8 @@ using UnityEngine.Networking;
 /// </summary>
 public class GameManager : NetworkBehaviour
 {
+	private int playerLife = 100;
+
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
@@ -37,6 +39,15 @@ public class GameManager : NetworkBehaviour
         players = GameObject.FindGameObjectsWithTag("Player");
         Debug.Log("Player connected; No of players: " + players.Length);
     }
+
+	public void hitByEnemySnowball() {
+		if (!isServer) {
+			return;
+		}
+
+		playerLife -= 10;
+		Debug.Log (playerLife);
+	}
 
 }
 
