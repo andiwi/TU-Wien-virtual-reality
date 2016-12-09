@@ -104,18 +104,18 @@ public class Actor : NetworkBehaviour
         {
             return;
         }
-        //DEBUG TODO remove
+
+        //DEBUG INPUT
         if (Input.GetKeyDown(KeyCode.G))
         {
             debugLog("Pressed G");
 
             GameObject test = GameObject.Find("TestSnowBall");
-
-            test.GetComponent<AuthorityManager>().GrabObject(GameObject.Find("VivePlayerController").transform);
-
-            //test grab first object
-            //sharedObjects[0].GrabObject();
-            //NetworkIdentity test1 = sharedObjects[0].GetNetworkIdentity();
+            if (test)
+            {
+                GameObject playerCtrl = GameObject.FindGameObjectWithTag("PlayerController");
+                test.GetComponent<AuthorityManager>().GrabObject(playerCtrl.transform);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -123,9 +123,10 @@ public class Actor : NetworkBehaviour
             debugLog("Pressed F");
 
             GameObject test = GameObject.Find("TestSnowBall");
-
-            test.GetComponent<AuthorityManager>().UnGrabObject();
-            //sharedObjects[0].UnGrabObject();
+            if (test)
+            {
+                test.GetComponent<AuthorityManager>().UnGrabObject();
+            }
         }
     }
 
@@ -243,14 +244,7 @@ public class Actor : NetworkBehaviour
     {
         debugLog("ReturnObjectAuthority...");
 
-        //if (IsHost() == false)
-        //{
         CmdRemoveObjectAuthorityFromClient(netID);
-        //} else
-        //{
-        //debugLog("client is HOST -> abort return object authority");
-        //}
-
     }
 
 
@@ -261,10 +255,7 @@ public class Actor : NetworkBehaviour
     {
         debugLog("CmdAssignObjectAuthorityToClient received, " + netID.netId);
 
-
-
-
-        //not working realiably....
+        //TODO in case it is not working relaibly again -> add sharedObject list again and manage state of spawned shared objects here
         GameObject authmanObject = NetworkServer.FindLocalObject(netID.netId);
         if (authmanObject)
         {

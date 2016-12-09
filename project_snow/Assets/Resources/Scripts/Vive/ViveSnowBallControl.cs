@@ -16,6 +16,7 @@ public class ViveSnowBallControl : MonoBehaviour
     //private bool triggerDown = false;
     AuthorityManager touchedSnowballAuthMan;
 
+
     /// <summary>
     /// to be set by TouchLeft/TouchRight
     /// </summary>
@@ -23,10 +24,16 @@ public class ViveSnowBallControl : MonoBehaviour
     /// <param name="authManSnowBall"></param>
     public void SetTouchingSnowBall(bool touching, AuthorityManager authManSnowBall)
     {
-        print("SetTouchingSnowBall touching: " + touching + " authMan: " +authManSnowBall);
+        print("SetTouchingSnowBall touching: " + touching + " authMan: " + authManSnowBall);
+
+        if (authManSnowBall == null && touchedSnowballAuthMan != null)
+        {
+            //when trigger exit and setting touchedSnowballAuthMan == null ->  Ungrab before deleting reference!
+            touchedSnowballAuthMan.UnGrabObject();
+        }
         touchingSnowBall = touching;
         touchedSnowballAuthMan = authManSnowBall;
-        //TODO when trigger exit and setting touchedSnowballAuthMan == null -> maybe Ungrab in before Authman first!
+
     }
 
     void Start()
@@ -40,9 +47,10 @@ public class ViveSnowBallControl : MonoBehaviour
     {
         if (touchingSnowBall && touchedSnowballAuthMan)
         {
-            print("TryPickUpSnowBall + touchingSnowBall -> request Authority/Grabing");       
+            print("TryPickUpSnowBall + touchingSnowBall -> request Authority/Grabing");
             touchedSnowballAuthMan.GrabObject(gameObject.transform);
-        } else
+        }
+        else
         {
             print("TryPickUpSnowBall - nice try - try touch snowball first...");
         }
@@ -55,7 +63,7 @@ public class ViveSnowBallControl : MonoBehaviour
             print("TryLetGoSnowBall + touchingSnowBall -> ungrab object in authMan ");
             //touchedSnowballAuthMan.UnGrabObject();
 
-            ThrowSnowball();
+            throwSnowball();
         }
         else
         {
@@ -69,17 +77,17 @@ public class ViveSnowBallControl : MonoBehaviour
         if (touchingSnowBall)
         {
             StartIdlePulse();
-            print("touching snow ball - start idle pulse if not started");
-
-        } else
+            //print("touching snow ball - start idle pulse if not started");
+        }
+        else
         {
             StopIdlePulse();
-            print("NOT touching snow ball - stop idle pulse if started");
+            //print("NOT touching snow ball - stop idle pulse if started");
         }
     }
 
 
-    void ThrowSnowball()
+    private void throwSnowball()
     {
         Transform origin = trackedObj.origin ? trackedObj.origin : trackedObj.transform.parent;
         if (origin != null)
@@ -102,7 +110,7 @@ public class ViveSnowBallControl : MonoBehaviour
     }
     void StopIdlePulse()
     {
-        if(idlePulsing == true)
+        if (idlePulsing == true)
         {
             StopCoroutine(idlePulseEnumerator);
             idlePulsing = false;
@@ -113,7 +121,6 @@ public class ViveSnowBallControl : MonoBehaviour
     {
         StartCoroutine(PulseVibration(duration, strength));
     }
-
 
 
     IEnumerator PulseVibration(float duration, float strength)

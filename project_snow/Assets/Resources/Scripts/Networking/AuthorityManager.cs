@@ -71,10 +71,6 @@ public class AuthorityManager : NetworkBehaviour
 
     }
 
-
-    /// <summary>
-    ///    assign localActor here 
-    /// </summary>
     public void AssignActor(Actor actor)
     {
         localActor = actor;
@@ -91,15 +87,13 @@ public class AuthorityManager : NetworkBehaviour
     [ClientRpc]
     public void RpcOnAuthorityAssignedToClient()
     {
-        //if (hasAuthority)
-        //{
-        //    debugLog("RpcGrabObject...");
-        //    onb.OnGrabbed(localActor.gameObject.transform);
-        //    grabbed = true;
-        //    //EventManager.OnAuthorityAssigned();
-        //}
         rigidbody.isKinematic = true;
+    }
 
+    [ClientRpc]
+    public void RpcOnAuthorityReleasedFromClient()
+    {
+        rigidbody.isKinematic = false;
     }
 
     [TargetRpc]
@@ -109,7 +103,6 @@ public class AuthorityManager : NetworkBehaviour
         debugLog("TargetRpcOnAuthorityAssigned... set OnGrabbed with grabTransform: " + grabTransform);
         onb.OnGrabbed(grabTransform);
         grabbed = true;
-        //rigidbody.isKinematic = true;  //TODO check if isKimenatic is necessary
     }
 
     [TargetRpc]
@@ -119,19 +112,6 @@ public class AuthorityManager : NetworkBehaviour
         debugLog("TargetRpcOnAuthorityAssigned...");
         onb.OnReleased();
         grabbed = false;
-        //rigidbody.isKinematic = false;  //TODO check if isKimenatic is necessary
-    }
-
-    [ClientRpc]
-    public void RpcOnAuthorityReleasedFromClient()
-    {
-        //if (hasAuthority)
-        //{
-        //    debugLog("RpcReleaseObject...");
-        //    onb.OnReleased();
-        //}
-        rigidbody.isKinematic = false;
-        //grabbed = false;
     }
 
     /// <summary>
@@ -258,13 +238,15 @@ public class AuthorityManager : NetworkBehaviour
         //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
         if (grabbed == false)
         {
-            if (hasAuthority)
-            {
-                debugLog("GrabObject - client already has authority -> grab object!");
-                onb.OnGrabbed(controllerTrans);
-                rigidbody.isKinematic = true;
-            }
-            else if (requestSent == false)
+            //if (hasAuthority)
+            //{
+            //    debugLog("GrabObject - client already has authority -> grab object!");
+            //    onb.OnGrabbed(controllerTrans);
+            //    rigidbody.isKinematic = true;
+            //    grabbed = true;
+            //}
+            //else 
+            if (requestSent == false)
             {
                 debugLog("GrabObject - client has no authority -> request authority");
                 grabTransform = controllerTrans;
@@ -275,21 +257,6 @@ public class AuthorityManager : NetworkBehaviour
         }
     }
 
-
-    //[Client]
-    //public void GrabObject()
-    //{
-    //    //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
-
-    //    if (grabbed == false && requestSent == false)
-    //    {
-    //        localActor.RequestObjectAuthority(netIDgameObj);
-    //    }
-
-    //    //task3
-    //    //if (onb.IsGrabbed() == false && requestSent == false)
-    //    //    localActor.RequestObjectAuthority(netID);
-    //}
 
     /// <summary>
     /// for debugging - keep authority when throwing for now 
@@ -307,21 +274,28 @@ public class AuthorityManager : NetworkBehaviour
         }
     }
 
-    private float forceStrength = 10;
+    private float forceStrength = 400;
     private float torqueStrength = 10;
 
     [Client]
     public void ThrowObject(Vector3 velocity, Vector3 angularVelocity)
     {
+        debugLog("ThrowObject - velocity: " + velocity + " , angularVelocity: " + angularVelocity);
+        UnGrabObject();
+        CmdThrowObject(velocity, angularVelocity);
+    }
+
+    [Command]
+    public void CmdThrowObject(Vector3 velocity, Vector3 angularVelocity)
+    {
         Vector3 force = velocity * forceStrength;
         Vector3 torque = angularVelocity * torqueStrength;
-
-        onb.OnReleased();
-        rigidbody.isKinematic = false;
+        debugLog("ThrowObject - force: " + force + " , torque: " + torque);
+                  
+        //rigidbody.isKinematic = false;
+        //TODO might be some delay, but lets try
         rigidbody.AddForce(force);
         rigidbody.AddTorque(torque);
-
-        debugLog("ThrowObject - force: " + force + " , torque: " + torque);
 
     }
 
@@ -335,19 +309,6 @@ public class AuthorityManager : NetworkBehaviour
             getLocalActor().ReturnObjectAuthority(netIDgameObj);
             requestSent = true;
         }
-
-
-        //Task3
-        //if (onb.IsGrabbed() == true && requestSent == false)
-        //    localActor.ReturnObjectAuthority(netID);
-    }
-
-    public override void OnStartLocalPlayer()
-    {
-        Debug.Log("OnStartLocalPlayer() ");
-        List<PlayerController> playerCtrls = NetworkController.FindInstance().client.connection.playerControllers;
-
-        Debug.Log("playerCtrls: " + playerCtrls.Count + " pls " + playerCtrls);
     }
 
 }
