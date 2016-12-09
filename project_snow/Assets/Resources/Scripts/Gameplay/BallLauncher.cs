@@ -37,15 +37,15 @@ public class BallLauncher : NetworkBehaviour
         if (timer > waitingTime)
         {
             //Action
-			Vector3 position = transform.position;
-			position.y += 1.5f;
-            //GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
-			GameObject ball = Instantiate(snowballPrefab, position, Quaternion.identity) as GameObject;
-			ball.transform.parent = snowballContainer.transform;
 			GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
-                GameObject ball = Instantiate(snowballPrefab, transform.position, Quaternion.identity) as GameObject;
+                Vector3 position = transform.position;
+                position.y += 1.5f;
+                      
+                GameObject ball = Instantiate(snowballPrefab, position, Quaternion.identity) as GameObject;
+                ball.transform.parent = snowballContainer.transform;
+
                 Debug.Log("instantiated ball: " +ball.name);
                 Launch(ball, targetPlayer.transform);
             }
@@ -54,8 +54,6 @@ public class BallLauncher : NetworkBehaviour
         }
 
     }
-
-
 
     [Server]
     private GameObject SelectPlayer()

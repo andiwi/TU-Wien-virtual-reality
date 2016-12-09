@@ -28,8 +28,6 @@ public class GameManager : NetworkBehaviour
 
     public Actor localActor { get; set; }
 
-    //public GameObject[] players { get; private set; }
-
     void Start()
     {
 
@@ -37,18 +35,15 @@ public class GameManager : NetworkBehaviour
 
         players = GameObject.FindGameObjectsWithTag("Player");
 		gameStatus = this.GetComponentInChildren<GUIText> ();
-		gameStatus.text = "Life: " + playerLife;
+        if (gameStatus)
+        {
+            gameStatus.text = "Life: " + playerLife;
+        }		
     }
 
     public GameObject[] GetPlayers()
     {
         return players;
-    }
-
-    public void CmdOnPlayerConnectedCallback()
-    {
-        players = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log("Player connected; No of players: " + players.Length);
     }
 
 	public void HitByEnemySnowball() {

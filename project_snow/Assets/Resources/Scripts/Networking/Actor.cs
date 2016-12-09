@@ -14,8 +14,7 @@ public class Actor : NetworkBehaviour
 
     //this part is for object sharing
     //*******************************
-    //List<NetworkIdentity> sharedObjects; // shared objects on the server or localActor
-    List<AuthorityManager> sharedObjects; // shared objects on the server or localActor
+    //List<AuthorityManager> sharedObjects; // shared objects on the server or localActor
     //*******************************
 
 
@@ -47,33 +46,13 @@ public class Actor : NetworkBehaviour
                 Debug.Log("Actor name: " + prefabName + " , is LOCAL PLAYER (host: " + IsHost() + ")");
                 // find objects that can be manipulated 
                 //TODO uncomment the for each
-
-				/*
                 GameManager.Instance.localActor = this;
-
-                Debug.Log("set localActor into GameManager: " + GameManager.Instance);
-				
-				//foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
-    //            {
-    //                // assign this Actor to the localActor field of the AuthorityManager component of each shared object
-    //                AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
-    //                authObj.AssignActor(this);
-                */
-    //            }
             }
             else if (isServer)
             {
                 //SERVER ONLY
-                Debug.Log("Actor: " + " is DEDICATED SERVER");
-                // find objects that can be manipulated 
-                //foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
-                //{
-                //    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
-                //    //sharedObjects.Add(authObj);
-                //}
-            }
-                */
-
+                Debug.Log("Actor: " + " is DEDICATED SERVER");   
+            }       
 
             //*******************************
 
