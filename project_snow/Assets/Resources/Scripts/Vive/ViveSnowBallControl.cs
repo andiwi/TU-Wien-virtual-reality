@@ -41,7 +41,7 @@ public class ViveSnowBallControl : MonoBehaviour
         if (touchingSnowBall && touchedSnowballAuthMan)
         {
             print("TryPickUpSnowBall + touchingSnowBall -> request Authority/Grabing");       
-            touchedSnowballAuthMan.GrabObject();
+            touchedSnowballAuthMan.GrabObject(gameObject.transform);
         } else
         {
             print("TryPickUpSnowBall - nice try - try touch snowball first...");

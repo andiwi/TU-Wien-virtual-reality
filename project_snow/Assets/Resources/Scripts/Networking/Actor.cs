@@ -111,7 +111,7 @@ public class Actor : NetworkBehaviour
 
             GameObject test = GameObject.Find("TestSnowBall");
 
-            test.GetComponent<AuthorityManager>().GrabObject();
+            test.GetComponent<AuthorityManager>().GrabObject(GameObject.Find("VivePlayerController").transform);
 
             //test grab first object
             //sharedObjects[0].GrabObject();

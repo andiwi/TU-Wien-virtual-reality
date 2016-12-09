@@ -25,6 +25,8 @@ public class AuthorityManager : NetworkBehaviour
                             // this component can implement different functionality for different GO´s
 
 
+    Transform grabTransform; //transform of the last request authority on this client -> for parenting in OnGrabbedBEhaviour
+    
 
     //these variables are set up and handled by both client and server
     Rigidbody rigidbody;
@@ -104,8 +106,8 @@ public class AuthorityManager : NetworkBehaviour
     public void TargetRpcOnAuthorityAssigned(NetworkConnection target)
     {
         //no hasAuthority abfrage since it might be delayed
-        debugLog("TargetRpcOnAuthorityAssigned...");
-        onb.OnGrabbed(getLocalActor().gameObject.transform);
+        debugLog("TargetRpcOnAuthorityAssigned... set OnGrabbed with grabTransform: " + grabTransform);
+        onb.OnGrabbed(grabTransform);
         grabbed = true;
         //rigidbody.isKinematic = true;  //TODO check if isKimenatic is necessary
     }
@@ -223,10 +225,10 @@ public class AuthorityManager : NetworkBehaviour
         TargetRpcOnRequestProcessed(conn);
     }
 
-    void OnNetworkDestroy()
-    {
-        debugLog("OnNetworkDestroy called");
-    }
+    //void OnNetworkDestroy()
+    //{
+    //    debugLog("OnNetworkDestroy called");
+    //}
 
     private void debugLog(string msg)
     {
@@ -251,25 +253,24 @@ public class AuthorityManager : NetworkBehaviour
     }
 
     [Client]
-    public void GrabObject()
+    public void GrabObject(Transform controllerTrans)
     {
         //  debugLog("GrabObject ... onbIsgrabbed: " + onb.IsGrabbed() + " ; requestSent: " + requestSent);
         if (grabbed == false)
         {
-
             if (hasAuthority)
             {
-
                 debugLog("GrabObject - client already has authority -> grab object!");
-                onb.OnGrabbed(getLocalActor().gameObject.transform);
-
+                onb.OnGrabbed(controllerTrans);
+                rigidbody.isKinematic = true;
             }
             else if (requestSent == false)
             {
                 debugLog("GrabObject - client has no authority -> request authority");
-
+                grabTransform = controllerTrans;
                 getLocalActor().RequestObjectAuthority(netIDgameObj);
                 requestSent = true;
+               
             }
         }
     }
@@ -302,6 +303,7 @@ public class AuthorityManager : NetworkBehaviour
         {
             onb.OnReleased();
             grabbed = false;
+            grabTransform = null;
         }
     }
 

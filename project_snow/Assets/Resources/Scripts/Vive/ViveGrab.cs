@@ -29,7 +29,7 @@ public class ViveGrab : MonoBehaviour {
 	 
 		if (leftHandTouching && rightHandTouching && leftTriggerDown && rightTriggerDown && am_left.Equals (am_right)) {
 			Debug.Log ("TOUCHING");
-			am_left.GrabObject ();
+			am_left.GrabObject (null);
 			// notify AuthorityManager that grab conditions are fulfilled
 		} else if (am_left != null) {
 			// grab conditions are not fulfilled

@@ -26,7 +26,7 @@ public class LeapGrab : MonoBehaviour {
 		if (leftHandTouching && rightHandTouching && leftPinch && rightPinch && am_left.Equals (am_right)) {
 			Debug.Log ("TOUCHING");
 			// notify AuthorityManager that grab conditions are fulfilled
-			am_left.GrabObject ();
+			am_left.GrabObject (null);
 		} else if (am_left != null) {
 			// grab conditions are not fulfilled
 			am_left.UnGrabObject ();
