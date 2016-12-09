@@ -16,19 +16,20 @@ public class TouchLeft : MonoBehaviour
 
     void Start()
     {
-       
+
 
     }
     void OnTriggerEnter(Collider other)
     {
-        if(thisActor == null)
+        if (thisActor == null)
         {
             thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
         }
         if (thisActor.isLocalPlayer == false) return;
-        GameObject playerController = GameObject.Find("PlayerController");
+        GameObject playerController = GameObject.FindGameObjectWithTag("PlayerController");
         if (playerController == null)
         {
+            print("TouchLeft - no playercontroller - abort");
             return;
         }
 
@@ -36,9 +37,7 @@ public class TouchLeft : MonoBehaviour
 
         if (vive)
         {
-            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
-            viveGrab.SetLeftHandTouching(true);
-            viveGrab.SetAuthorityManagerLeft(am);
+            handleViveOnTriggerEnter(playerController, am);
 
         }
         else if (leap)
@@ -49,6 +48,8 @@ public class TouchLeft : MonoBehaviour
         }
     }
 
+
+
     void OnTriggerExit()
     {
         if (thisActor == null)
@@ -56,18 +57,16 @@ public class TouchLeft : MonoBehaviour
             thisActor = gameObject.transform.parent.parent.gameObject.GetComponent<Actor>();
         }
         if (thisActor.isLocalPlayer == false) return;
-        GameObject playerController = GameObject.Find("PlayerController");
+        GameObject playerController = GameObject.FindGameObjectWithTag("PlayerController");
         if (playerController == null)
         {
+            print("TouchLeft - no playercontroller - abort");
             return;
         }
 
         if (vive)
         {
-            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
-            viveGrab.SetLeftHandTouching(false);
-            viveGrab.SetAuthorityManagerLeftNull();
-
+            handleViveOnTriggerExit(playerController);
         }
         else if (leap)
         {
@@ -76,5 +75,30 @@ public class TouchLeft : MonoBehaviour
             leapGrab.SetAuthorityManagerLeftNull();
         }
     }
+
+
+    private void handleViveOnTriggerEnter(GameObject playerController, AuthorityManager am)
+    {
+        if (am == null) return;
+
+        GameObject leftCtrl = playerController.transform.Find("Controller (left)").gameObject;
+        if (leftCtrl == null) return;
+        print("found leftCtrl!");
+
+        ViveSnowBallControl snowBallCtrl = leftCtrl.GetComponent<ViveSnowBallControl>();
+        snowBallCtrl.SetTouchingSnowBall(true, am);
+    }
+
+    private void handleViveOnTriggerExit(GameObject playerController)
+    {
+
+        GameObject leftCtrl = playerController.transform.Find("Controller (left)").gameObject;
+        if (leftCtrl == null) return;
+        print("found leftCtrl!");
+
+        ViveSnowBallControl snowBallCtrl = leftCtrl.GetComponent<ViveSnowBallControl>();
+        snowBallCtrl.SetTouchingSnowBall(false, null);
+    }
+
 
 }

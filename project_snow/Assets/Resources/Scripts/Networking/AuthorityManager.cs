@@ -179,6 +179,7 @@ public class AuthorityManager : NetworkBehaviour
         authorityAssigned = true;
         netIDgameObj.AssignClientAuthority(conn);
         debugLog("granting localPlayerAuthority!");
+        TargetRpcOnAuthorityAssigned(conn);
         RpcOnAuthorityAssignedToClient();
         rigidbody.isKinematic = true;
 
@@ -206,6 +207,7 @@ public class AuthorityManager : NetworkBehaviour
         bool removed = netIDgameObj.RemoveClientAuthority(conn);
         if (removed)
         {
+            TargetRpcOnAuthorityReleased(conn);
 
             if (authRequestConnections.Count > 0)
             {
@@ -219,6 +221,11 @@ public class AuthorityManager : NetworkBehaviour
         }
 
         TargetRpcOnRequestProcessed(conn);
+    }
+
+    void OnNetworkDestroy()
+    {
+        debugLog("OnNetworkDestroy called");
     }
 
     private void debugLog(string msg)

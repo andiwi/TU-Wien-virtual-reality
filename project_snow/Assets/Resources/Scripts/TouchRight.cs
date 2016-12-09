@@ -29,21 +29,18 @@ public class TouchRight : MonoBehaviour
         }
         if (thisActor.isLocalPlayer == false) return;
 
-        GameObject playerController = GameObject.Find("PlayerController");
+        GameObject playerController = GameObject.FindGameObjectWithTag("PlayerController");
         if (playerController == null)
         {
+            debugLog("no playercontroller - abort");
             return;
         }
-
-
 
         AuthorityManager am = other.gameObject.GetComponent<AuthorityManager>();
 
         if (vive)
         {
-            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
-            viveGrab.SetRightHandTouching(true);
-            viveGrab.SetAuthorityManagerRight(am);
+            handleViveOnTriggerEnter(playerController, am);
         }
         else if (leap)
         {
@@ -61,24 +58,58 @@ public class TouchRight : MonoBehaviour
         }
         if (thisActor.isLocalPlayer == false) return;
 
-        GameObject playerController = GameObject.Find("PlayerController");
+        GameObject playerController = GameObject.FindGameObjectWithTag("PlayerController");
         if (playerController == null)
         {
+            debugLog("no playercontroller - abort");
             return;
         }
 
         if (vive)
         {
-            ViveGrab viveGrab = playerController.GetComponent<ViveGrab>();
-            viveGrab.SetRightHandTouching(false);
-			viveGrab.SetAuthorityManagerRightNull();
+            handleViveOnTriggerExit(playerController);
 
         }
         else if (leap)
         {
             LeapGrab leapGrab = playerController.GetComponent<LeapGrab>();
             leapGrab.SetRightHandTouching(false);
-			leapGrab.SetAuthorityManagerRightNull();
+            leapGrab.SetAuthorityManagerRightNull();
         }
     }
+
+
+    private void handleViveOnTriggerEnter(GameObject playerController, AuthorityManager am)
+    {
+        if (am == null) return;
+
+        GameObject rightCtrl = playerController.transform.Find("Controller (right)").gameObject;
+        if (rightCtrl == null) return;
+     
+
+        ViveSnowBallControl snowBallCtrl = rightCtrl.GetComponent<ViveSnowBallControl>();
+
+        //debugLog("found Controller (right) and calling setTouchingSnowBall to true");
+        snowBallCtrl.SetTouchingSnowBall(true, am);
+
+
+    }
+
+    private void handleViveOnTriggerExit(GameObject playerController)
+    {
+
+        GameObject rightCtrl = playerController.transform.Find("Controller (right)").gameObject;
+        if (rightCtrl == null) return;
+
+        ViveSnowBallControl snowBallCtrl = rightCtrl.GetComponent<ViveSnowBallControl>();
+
+        //debugLog("found Controller (right) and calling setTouchingSnowBall to true");
+        snowBallCtrl.SetTouchingSnowBall(false, null);
+    }
+
+    private void debugLog(string log)
+    {
+        print("TouchRight - " + log);
+    }
+
 }

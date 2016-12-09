@@ -11,7 +11,24 @@ public class ViveSnowBallControl : MonoBehaviour
     private bool idlePulsing = false;
 
 
-    // Use this for initialization
+    // touch and trigger state - set by external components (TouchLeft/TouchRight)
+    private bool touchingSnowBall = false;
+    //private bool triggerDown = false;
+    AuthorityManager touchedSnowballAuthMan;
+
+    /// <summary>
+    /// to be set by TouchLeft/TouchRight
+    /// </summary>
+    /// <param name="touching"></param>
+    /// <param name="authManSnowBall"></param>
+    public void SetTouchingSnowBall(bool touching, AuthorityManager authManSnowBall)
+    {
+        print("SetTouchingSnowBall touching: " + touching + " authMan: " +authManSnowBall);
+        touchingSnowBall = touching;
+        touchedSnowballAuthMan = authManSnowBall;
+        //TODO when trigger exit and setting touchedSnowballAuthMan == null -> maybe Ungrab in before Authman first!
+    }
+
     void Start()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
@@ -19,51 +36,82 @@ public class ViveSnowBallControl : MonoBehaviour
         idlePulseEnumerator = PulseVibration(10000, 0.25f, 0.5f, 0.1f);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TryPickUpSnowBall()
     {
-
-    }
-
-    void OnTriggerStay(Collider collider)
-    {
-        Debug.Log("You have collided with " + collider.name + " and activated OnTriggerStay");
-
-
-        AuthorityManager colAuthMan = collider.gameObject.GetComponent<AuthorityManager>();
-
-        if (colAuthMan != null)
+        if (touchingSnowBall && touchedSnowballAuthMan)
         {
-
-            StartIdlePulse();
-
-            if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger))
-            {
-                Debug.Log("You have collided with " + collider.name + " while holding down Touch");
-
-                colAuthMan.GrabObject();
-
-                //collider.attachedRigidbody.isKinematic = true;  
-                //collider.gameObject.transform.SetParent(gameObject.transform);
-            }
-            if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
-            {
-                Debug.Log("You have released Touch while colliding with " + collider.name);
-                //collider.gameObject.transform.SetParent(null);
-                //collider.attachedRigidbody.isKinematic = false;
-
-                colAuthMan.UnGrabObject();
-                ThrowSnowball(collider.attachedRigidbody);
-            }
-
+            print("TryPickUpSnowBall + touchingSnowBall -> request Authority/Grabing");       
+            touchedSnowballAuthMan.GrabObject();
+        } else
+        {
+            print("TryPickUpSnowBall - nice try - try touch snowball first...");
         }
     }
 
-    void OnTriggerExit(Collider collider)
+    public void TryLetGoSnowBall()
     {
-        Debug.Log("OnTriggerExit - stop pulsing");
-        StopIdlePulse();
+        if (touchingSnowBall && touchedSnowballAuthMan)
+        {
+            print("TryLetGoSnowBall + touchingSnowBall -> ungrab object in authMan ");     
+            touchedSnowballAuthMan.UnGrabObject();
+        }
+        else
+        {
+            print("TryLetGoSnowBall - nice try - try touch snowball first...");
+        }
     }
+
+
+    void Update()
+    {
+        if (touchingSnowBall)
+        {
+            StartIdlePulse();
+            print("touching snow ball - start idle pulse if not started");
+
+        } else
+        {
+            StopIdlePulse();
+            print("NOT touching snow ball - stop idle pulse if started");
+        }
+    }
+
+    //void OnTriggerStay(Collider collider)
+    //{
+    //    Debug.Log("You have collided with " + collider.name + " and activated OnTriggerStay");
+
+
+    //    AuthorityManager colAuthMan = collider.gameObject.GetComponent<AuthorityManager>();
+
+    //    if (colAuthMan != null)
+    //    {        
+    //        if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger))
+    //        {
+    //            Debug.Log("You have collided with " + collider.name + " while holding down Touch");
+
+    //            colAuthMan.GrabObject();
+
+    //            //collider.attachedRigidbody.isKinematic = true;  
+    //            //collider.gameObject.transform.SetParent(gameObject.transform);
+    //        }
+    //        if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
+    //        {
+    //            Debug.Log("You have released Touch while colliding with " + collider.name);
+    //            //collider.gameObject.transform.SetParent(null);
+    //            //collider.attachedRigidbody.isKinematic = false;
+
+    //            colAuthMan.UnGrabObject();
+    //            ThrowSnowball(collider.attachedRigidbody);
+    //        }
+
+    //    }
+    //}
+
+    //void OnTriggerExit(Collider collider)
+    //{
+    //    Debug.Log("OnTriggerExit - stop pulsing");
+    //    StopIdlePulse();
+    //}
 
     void ThrowSnowball(Rigidbody rigidBody)
     {

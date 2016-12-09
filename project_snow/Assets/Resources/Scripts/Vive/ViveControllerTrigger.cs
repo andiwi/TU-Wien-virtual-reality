@@ -37,7 +37,8 @@ public class ViveControllerTrigger : MonoBehaviour {
 
         print("SetTriggerClicked ");
 
-	}
+        snowBallCtrl.TryPickUpSnowBall();
+    }
 
 	private void SetTriggerUnclicked(object sender, ClickedEventArgs e) {
         //if (leftController) {
@@ -47,5 +48,7 @@ public class ViveControllerTrigger : MonoBehaviour {
         //}
 
         print("SetTriggerUnclicked ");
+
+        snowBallCtrl.TryLetGoSnowBall();
     }
 }

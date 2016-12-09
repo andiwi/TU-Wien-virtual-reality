@@ -15,7 +15,7 @@ public class Actor : NetworkBehaviour
     //this part is for object sharing
     //*******************************
     //List<NetworkIdentity> sharedObjects; // shared objects on the server or localActor
-    //List<AuthorityManager> sharedObjects; // shared objects on the server or localActor
+    List<AuthorityManager> sharedObjects; // shared objects on the server or localActor
     //*******************************
 
 
@@ -52,24 +52,24 @@ public class Actor : NetworkBehaviour
 
                 Debug.Log("set localActor into GameManager: " + GameManager.Instance);
 				
-				foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
-                {
-                    // assign this Actor to the localActor field of the AuthorityManager component of each shared object
-                    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
-                    authObj.AssignActor(this);
-                   // sharedObjects.Add(authObj);
-                }
+				//foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+    //            {
+    //                // assign this Actor to the localActor field of the AuthorityManager component of each shared object
+    //                AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
+    //                authObj.AssignActor(this);
+    //               // sharedObjects.Add(authObj);
+    //            }
             }
             else if (isServer)
             {
                 //SERVER ONLY
                 Debug.Log("Actor: " + " is DEDICATED SERVER");
                 // find objects that can be manipulated 
-                foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
-                {
-                    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
-                    //sharedObjects.Add(authObj);
-                }
+                //foreach (GameObject curr in GameObject.FindGameObjectsWithTag("shared"))
+                //{
+                //    AuthorityManager authObj = curr.GetComponent<AuthorityManager>();
+                //    //sharedObjects.Add(authObj);
+                //}
             }
 
 
@@ -105,9 +105,13 @@ public class Actor : NetworkBehaviour
             return;
         }
         //DEBUG TODO remove
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.G))
         {
-            debugLog("Pressed space bar");
+            debugLog("Pressed G");
+
+            GameObject test = GameObject.Find("TestSnowBall");
+
+            test.GetComponent<AuthorityManager>().GrabObject();
 
             //test grab first object
             //sharedObjects[0].GrabObject();
@@ -118,6 +122,9 @@ public class Actor : NetworkBehaviour
         {
             debugLog("Pressed F");
 
+            GameObject test = GameObject.Find("TestSnowBall");
+
+            test.GetComponent<AuthorityManager>().UnGrabObject();
             //sharedObjects[0].UnGrabObject();
         }
     }
@@ -254,7 +261,11 @@ public class Actor : NetworkBehaviour
     {
         debugLog("CmdAssignObjectAuthorityToClient received, " + netID.netId);
 
-        GameObject authmanObject = NetworkServer.FindLocalObject(netID.netId);    
+
+
+
+        //not working realiably....
+        GameObject authmanObject = NetworkServer.FindLocalObject(netID.netId);
         if (authmanObject)
         {
             AuthorityManager authMan = authmanObject.GetComponent<AuthorityManager>();
@@ -265,7 +276,7 @@ public class Actor : NetworkBehaviour
         }
         else
         {
-            debugLog("CmdAssignObjectAuthorityToClient - ERROR: no authmanObject found");        
+            debugLog("CmdAssignObjectAuthorityToClient - ERROR: no authmanObject found");
         }
     }
 
