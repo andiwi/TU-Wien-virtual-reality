@@ -307,6 +307,24 @@ public class AuthorityManager : NetworkBehaviour
         }
     }
 
+    private float forceStrength = 10;
+    private float torqueStrength = 10;
+
+    [Client]
+    public void ThrowObject(Vector3 velocity, Vector3 angularVelocity)
+    {
+        Vector3 force = velocity * forceStrength;
+        Vector3 torque = angularVelocity * torqueStrength;
+
+        onb.OnReleased();
+        rigidbody.isKinematic = false;
+        rigidbody.AddForce(force);
+        rigidbody.AddTorque(torque);
+
+        debugLog("ThrowObject - force: " + force + " , torque: " + torque);
+
+    }
+
     [Client]
     public void UnGrabObject()
     {

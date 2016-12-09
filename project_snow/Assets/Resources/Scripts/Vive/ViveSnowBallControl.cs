@@ -52,8 +52,10 @@ public class ViveSnowBallControl : MonoBehaviour
     {
         if (touchingSnowBall && touchedSnowballAuthMan)
         {
-            print("TryLetGoSnowBall + touchingSnowBall -> ungrab object in authMan ");     
-            touchedSnowballAuthMan.UnGrabObject();
+            print("TryLetGoSnowBall + touchingSnowBall -> ungrab object in authMan ");
+            //touchedSnowballAuthMan.UnGrabObject();
+
+            ThrowSnowball();
         }
         else
         {
@@ -76,57 +78,18 @@ public class ViveSnowBallControl : MonoBehaviour
         }
     }
 
-    //void OnTriggerStay(Collider collider)
-    //{
-    //    Debug.Log("You have collided with " + collider.name + " and activated OnTriggerStay");
 
-
-    //    AuthorityManager colAuthMan = collider.gameObject.GetComponent<AuthorityManager>();
-
-    //    if (colAuthMan != null)
-    //    {        
-    //        if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger))
-    //        {
-    //            Debug.Log("You have collided with " + collider.name + " while holding down Touch");
-
-    //            colAuthMan.GrabObject();
-
-    //            //collider.attachedRigidbody.isKinematic = true;  
-    //            //collider.gameObject.transform.SetParent(gameObject.transform);
-    //        }
-    //        if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger))
-    //        {
-    //            Debug.Log("You have released Touch while colliding with " + collider.name);
-    //            //collider.gameObject.transform.SetParent(null);
-    //            //collider.attachedRigidbody.isKinematic = false;
-
-    //            colAuthMan.UnGrabObject();
-    //            ThrowSnowball(collider.attachedRigidbody);
-    //        }
-
-    //    }
-    //}
-
-    //void OnTriggerExit(Collider collider)
-    //{
-    //    Debug.Log("OnTriggerExit - stop pulsing");
-    //    StopIdlePulse();
-    //}
-
-    void ThrowSnowball(Rigidbody rigidBody)
+    void ThrowSnowball()
     {
         Transform origin = trackedObj.origin ? trackedObj.origin : trackedObj.transform.parent;
         if (origin != null)
         {
-            rigidBody.velocity = origin.TransformVector(device.velocity);
-            rigidBody.angularVelocity = origin.TransformVector(device.angularVelocity);          
+            touchedSnowballAuthMan.ThrowObject(origin.TransformVector(device.velocity), origin.TransformVector(device.angularVelocity));
         }
         else
         {
-            rigidBody.velocity = device.velocity;
-            rigidBody.angularVelocity = device.angularVelocity;
+            touchedSnowballAuthMan.ThrowObject(device.velocity, device.angularVelocity);
         }
-
     }
 
     void StartIdlePulse()
