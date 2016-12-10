@@ -77,6 +77,9 @@ public class BallLauncher : NetworkBehaviour
     void Launch(GameObject ball, Transform target)
     {
 
+        //make enemie look at current player he is shooting at
+        gameObject.transform.LookAt(target);
+
         Physics.gravity = Vector3.up * gravity;
         Rigidbody ballRigid = ball.GetComponent<Rigidbody>();
         ballRigid.useGravity = true;

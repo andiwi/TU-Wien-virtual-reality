@@ -3,6 +3,8 @@ using System.Collections;
 
 public class CameraMoveScript : MonoBehaviour {
 
+
+    public Camera serverCamera;
 	// Use this for initialization
 	void Start () {
 	
@@ -12,9 +14,9 @@ public class CameraMoveScript : MonoBehaviour {
 	void Update () {
         float xAxisValue = Input.GetAxis("Horizontal");
         float zAxisValue = Input.GetAxis("Vertical");
-        if (Camera.current != null)
-        {
-            Camera.current.transform.Translate(new Vector3(xAxisValue, 0.0f, zAxisValue));
-        }
+        
+   
+            gameObject.transform.Translate(new Vector3(xAxisValue, 0.0f, zAxisValue));
+     
     }
 }
