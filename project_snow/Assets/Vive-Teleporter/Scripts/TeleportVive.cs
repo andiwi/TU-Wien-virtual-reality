@@ -166,14 +166,16 @@ public class TeleportVive : MonoBehaviour {
 
                 TeleportTimeMarker = Time.time;
                 FadingIn = !FadingIn;
+             
             }
-
+            print("VIVE TELEPORT!");
             return;
         }
 
         // At this point, we are NOT actively teleporting.  So now we care about controller input.
         if (ActiveController != null)
         {
+            print("VIVE TELEPORT ActiveController != null !");
             // Here, there is an active controller - that is, the user is holding down on the trackpad.
             // Poll controller for pertinent button data
             int index = (int)ActiveController.index;
@@ -185,8 +187,10 @@ public class TeleportVive : MonoBehaviour {
                 // If the user has decided to teleport (ie lets go of touchpad) then remove all visual indicators
                 // related to selecting things and actually teleport
                 // If the user has decided to cancel (ie squeezes grip button) then remove visual indicators and do nothing
-                if(shouldTeleport && Pointer.PointOnNavMesh)
-                {
+                print("VIVE TELEPORT shouldTeleport: " + shouldTeleport + " , PointerOnNavMesh: " + Pointer.PointOnNavMesh);
+
+                if (shouldTeleport && Pointer.PointOnNavMesh)
+                {           
                     // Begin teleport sequence
                     Teleporting = true;
                     TeleportTimeMarker = Time.time;
@@ -249,6 +253,7 @@ public class TeleportVive : MonoBehaviour {
                     if(NavmeshAnimator != null)
                         NavmeshAnimator.SetBool(EnabledAnimatorID, true);
 
+                
                     Pointer.ForceUpdateCurrentAngle();
                     LastClickAngle = Pointer.CurrentParabolaAngle;
                 }

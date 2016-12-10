@@ -92,6 +92,7 @@ public class ParabolicPointer : MonoBehaviour {
             bool cast = nav.Linecast(last, next, out endOnNavmesh, out castHit);
             if (cast)
             {
+                print("ParabolicPointer - " + cast + " castHit etc");
                 outPts.Add(castHit);
                 return endOnNavmesh;
             }

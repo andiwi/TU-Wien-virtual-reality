@@ -35,28 +35,13 @@ public class ViveNavMesh : MonoBehaviour
     private float LastGroundAlpha = 1.0f;
     private int AlphaShaderID = -1;
 
-    public int LayerMask
+    public LayerMask LayerMask
     {
         get { return _LayerMask; }
         set { _LayerMask = value; }
     }
     [SerializeField]
-    private int _LayerMask = 0;
-    public bool IgnoreLayerMask
-    {
-        get { return _IgnoreLayerMask; }
-        set { _IgnoreLayerMask = value; }
-    }
-    [SerializeField]
-    private bool _IgnoreLayerMask = true;
-
-    public int QueryTriggerInteraction
-    {
-        get { return _QueryTriggerInteraction; }
-        set { _QueryTriggerInteraction = value; }
-    }
-    [SerializeField]
-    private int _QueryTriggerInteraction = 0;
+    private LayerMask _LayerMask = 0;
 
     /// A Mesh that represents the "Selectable" area of the world.  This is converted from Unity's NavMesh in ViveNavMeshEditor
     public Mesh SelectableMesh
@@ -195,7 +180,10 @@ public class ViveNavMesh : MonoBehaviour
         Vector3 dir = p2 - p1;
         float dist = dir.magnitude;
         dir /= dist;
-        if (Physics.Raycast(p1, dir, out hit, dist, _IgnoreLayerMask ? ~_LayerMask : _LayerMask, (QueryTriggerInteraction)_QueryTriggerInteraction))
+
+        int ignoredLayerMask = ~(1 << _LayerMask); 
+
+        if (Physics.Raycast(p1, dir, out hit, dist, ignoredLayerMask)) //, (QueryTriggerInteraction)_QueryTriggerInteraction)
         {
             if (Vector3.Dot(Vector3.up, hit.normal) < 0.99f)
             {
@@ -205,8 +193,9 @@ public class ViveNavMesh : MonoBehaviour
             }
             hitPoint = hit.point;
             NavMeshHit navHit;
-            pointOnNavmesh = NavMesh.SamplePosition(hitPoint, out navHit, 0.05f, _NavAreaMask);
+            pointOnNavmesh = NavMesh.SamplePosition(hitPoint, out navHit, 5f, _NavAreaMask);
 
+            //print("ViveNavMesh fucking pointOnNavmesh - " + pointOnNavmesh + " _NavAreaMask:" + _NavAreaMask + " navHit:" + navHit + " hitPoint: " + hitPoint);
             // This is necessary because NavMesh.SamplePosition does a sphere intersection, not a projection onto the mesh or
             // something like that.  This means that in some scenarios you can have a point that's not actually on/above
             // the NavMesh but is right next to it.  However, if the point is above a Navmesh position that has a normal

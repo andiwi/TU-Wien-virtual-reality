@@ -14,8 +14,6 @@ public class ViveNavMeshEditor : Editor {
     private SerializedProperty p_material;
     private SerializedProperty p_alpha;
     private SerializedProperty p_layer_mask;
-    private SerializedProperty p_ignore_layer_mask;
-    private SerializedProperty p_query_trigger_interaction;
 
     void OnEnable()
     {
@@ -24,8 +22,6 @@ public class ViveNavMeshEditor : Editor {
         p_material = serializedObject.FindProperty("_GroundMaterial");
         p_alpha = serializedObject.FindProperty("GroundAlpha");
         p_layer_mask = serializedObject.FindProperty("_LayerMask");
-        p_ignore_layer_mask = serializedObject.FindProperty("_IgnoreLayerMask");
-        p_query_trigger_interaction = serializedObject.FindProperty("_QueryTriggerInteraction");
     }
 
     public override void OnInspectorGUI()
@@ -147,7 +143,6 @@ public class ViveNavMeshEditor : Editor {
         EditorGUILayout.LabelField("Raycast Settings", EditorStyles.boldLabel);
 
         int temp_layer_mask = p_layer_mask.intValue;
-        bool temp_ignore_layer_mask = p_ignore_layer_mask.boolValue;
 
         EditorGUI.BeginChangeCheck();
         temp_layer_mask = EditorGUILayout.LayerField("Layer Mask", temp_layer_mask);
@@ -156,23 +151,7 @@ public class ViveNavMeshEditor : Editor {
             p_layer_mask.intValue = temp_layer_mask;
         }
         serializedObject.ApplyModifiedProperties();
-        EditorGUI.BeginChangeCheck();
-        temp_ignore_layer_mask = EditorGUILayout.Toggle("Ignore Layer Mask", temp_ignore_layer_mask);
-        if (EditorGUI.EndChangeCheck())
-        {
-            p_ignore_layer_mask.boolValue = temp_ignore_layer_mask;
-        }
-        serializedObject.ApplyModifiedProperties();
-
-        QueryTriggerInteraction temp_query_trigger_interaction = (QueryTriggerInteraction)p_query_trigger_interaction.intValue;
-
-        EditorGUI.BeginChangeCheck();
-        temp_query_trigger_interaction = (QueryTriggerInteraction)EditorGUILayout.EnumPopup("Query Trigger Interaction", (QueryTriggerInteraction)temp_query_trigger_interaction);
-        if (EditorGUI.EndChangeCheck())
-        {
-            p_query_trigger_interaction.intValue = (int)temp_query_trigger_interaction;
-        }
-        serializedObject.ApplyModifiedProperties();
+      
     }
 
     /// \brief Modifies the given NavMesh so that only the Navigation areas are present in the mesh.  This is done only 
