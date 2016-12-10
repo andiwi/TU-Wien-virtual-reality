@@ -19,7 +19,7 @@ public class ViveNavMesh : MonoBehaviour
         {
             Material old = _GroundMaterial;
             _GroundMaterial = value;
-            if(_GroundMaterial != null)
+            if (_GroundMaterial != null)
                 _GroundMaterial.SetFloat(AlphaShaderID, GroundAlpha);
             if (old != _GroundMaterial)
                 Cleanup();
@@ -30,10 +30,33 @@ public class ViveNavMesh : MonoBehaviour
 
     /// \brief The alpha (transparency) value of the rendered ground mesh)
     /// \sa GroundMaterial
-    [Range(0,1)]
+    [Range(0, 1)]
     public float GroundAlpha = 1.0f;
     private float LastGroundAlpha = 1.0f;
     private int AlphaShaderID = -1;
+
+    public int LayerMask
+    {
+        get { return _LayerMask; }
+        set { _LayerMask = value; }
+    }
+    [SerializeField]
+    private int _LayerMask = 0;
+    public bool IgnoreLayerMask
+    {
+        get { return _IgnoreLayerMask; }
+        set { _IgnoreLayerMask = value; }
+    }
+    [SerializeField]
+    private bool _IgnoreLayerMask = true;
+
+    public int QueryTriggerInteraction
+    {
+        get { return _QueryTriggerInteraction; }
+        set { _QueryTriggerInteraction = value; }
+    }
+    [SerializeField]
+    private int _QueryTriggerInteraction = 0;
 
     /// A Mesh that represents the "Selectable" area of the world.  This is converted from Unity's NavMesh in ViveNavMeshEditor
     public Mesh SelectableMesh
@@ -41,7 +64,8 @@ public class ViveNavMesh : MonoBehaviour
         get { return _SelectableMesh; }
         set { _SelectableMesh = value; Cleanup(); } // Cleanup because we need to change the mesh inside command buffers
     }
-    [SerializeField] [HideInInspector]
+    [SerializeField]
+    [HideInInspector]
     private Mesh _SelectableMesh;
 
     /// \brief The border points of SelectableMesh.  This is automatically generated in ViveNavMeshEditor.
@@ -54,17 +78,20 @@ public class ViveNavMesh : MonoBehaviour
         get { return _SelectableMeshBorder; }
         set { _SelectableMeshBorder = value; Border.Points = _SelectableMeshBorder; }
     }
-    [SerializeField] [HideInInspector]
+    [SerializeField]
+    [HideInInspector]
     private BorderPointSet[] _SelectableMeshBorder;
 
-    [SerializeField] [HideInInspector]
+    [SerializeField]
+    [HideInInspector]
     private int _NavAreaMask = ~0; // Initialize to all
 
     private BorderRenderer Border;
 
     private Dictionary<Camera, CommandBuffer> cameras = new Dictionary<Camera, CommandBuffer>();
 
-    void Start () {
+    void Start()
+    {
         if (SelectableMesh == null)
             SelectableMesh = new Mesh();
         if (_SelectableMeshBorder == null)
@@ -79,7 +106,7 @@ public class ViveNavMesh : MonoBehaviour
 #endif
     }
 
-    void Update ()
+    void Update()
     {
         // We have to detect changes this way instead of using properties because
         // we want to be able to animate the alpha value with a Unity animator.
@@ -147,7 +174,7 @@ public class ViveNavMesh : MonoBehaviour
         Border = GetComponent<BorderRenderer>();
         Border.Points = SelectableMeshBorder;
 
-        if(AlphaShaderID == -1)
+        if (AlphaShaderID == -1)
             AlphaShaderID = Shader.PropertyToID("_Alpha");
     }
 
@@ -168,9 +195,9 @@ public class ViveNavMesh : MonoBehaviour
         Vector3 dir = p2 - p1;
         float dist = dir.magnitude;
         dir /= dist;
-        if(Physics.Raycast(p1, dir, out hit, dist))
+        if (Physics.Raycast(p1, dir, out hit, dist, _IgnoreLayerMask ? ~_LayerMask : _LayerMask, (QueryTriggerInteraction)_QueryTriggerInteraction))
         {
-            if(Vector3.Dot(Vector3.up, hit.normal) < 0.99f)
+            if (Vector3.Dot(Vector3.up, hit.normal) < 0.99f)
             {
                 pointOnNavmesh = false;
                 hitPoint = hit.point;
@@ -185,7 +212,7 @@ public class ViveNavMesh : MonoBehaviour
             // the NavMesh but is right next to it.  However, if the point is above a Navmesh position that has a normal
             // of (0,1,0) we can assume that the closest position on the Navmesh to any point has the same x/z coordinates
             // UNLESS that point isn't on top of the Navmesh.
-            if( !Mathf.Approximately(navHit.position.x, hitPoint.x) || 
+            if (!Mathf.Approximately(navHit.position.x, hitPoint.x) ||
                 !Mathf.Approximately(navHit.position.z, hitPoint.z))
                 pointOnNavmesh = false;
 
