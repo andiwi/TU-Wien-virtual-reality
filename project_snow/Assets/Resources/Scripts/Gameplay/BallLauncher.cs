@@ -13,8 +13,9 @@ public class BallLauncher : NetworkBehaviour
     public int ballLivingTime = 10;
 
 
-	public GameObject snowballContainer;
+    public GameObject snowballContainer;
     public GameObject snowballPrefab;
+    public Transform ballLaunchStart;
     public Transform targetPassed;
 
     public float height = 25;
@@ -23,11 +24,13 @@ public class BallLauncher : NetworkBehaviour
 
     public float targetPosVariation = 4;
 
-	void Start() {
-		if (snowballContainer == null) {
-			snowballContainer = GameObject.Find ("Snowballs");
-		}
-	}
+    void Start()
+    {
+        if (snowballContainer == null)
+        {
+            snowballContainer = GameObject.Find("Snowballs");
+        }
+    }
 
     void Update()
     {
@@ -37,16 +40,18 @@ public class BallLauncher : NetworkBehaviour
         if (timer > waitingTime)
         {
             //Action
-			GameObject targetPlayer = SelectPlayer();
+            GameObject targetPlayer = SelectPlayer();
             if (targetPlayer != null)
             {
-                Vector3 position = transform.position;
-                position.y += 1.5f;
-                      
+                //make enemie look at current player he is shooting at
+                gameObject.transform.LookAt(targetPlayer.transform);
+
+                Vector3 position = (ballLaunchStart) ? ballLaunchStart.position : transform.position + new Vector3(0, 1.5f, 0);
+
                 GameObject ball = Instantiate(snowballPrefab, position, Quaternion.identity) as GameObject;
                 ball.transform.parent = snowballContainer.transform;
 
-                Debug.Log("instantiated ball: " +ball.name);
+                Debug.Log("instantiated ball: " + ball.name);
                 Launch(ball, targetPlayer.transform);
             }
 
@@ -77,17 +82,14 @@ public class BallLauncher : NetworkBehaviour
     void Launch(GameObject ball, Transform target)
     {
 
-        //make enemie look at current player he is shooting at
-        gameObject.transform.LookAt(target);
-
         Physics.gravity = Vector3.up * gravity;
         Rigidbody ballRigid = ball.GetComponent<Rigidbody>();
         ballRigid.useGravity = true;
         ballRigid.velocity = CalculateLaunchData(ballRigid, target).initialVelocity;
-		//ballRigid.velocity = new Vector3 (0, 30, 20);
-		//Debug.Log (ballRigid.velocity);
+        //ballRigid.velocity = new Vector3 (0, 30, 20);
+        //Debug.Log (ballRigid.velocity);
 
-        NetworkServer.Spawn(ball); 
+        NetworkServer.Spawn(ball);
         StartCoroutine(WaitAndDestroyBall(ball));
     }
 
@@ -102,10 +104,11 @@ public class BallLauncher : NetworkBehaviour
     [ClientRpc]
     public void RpcInitBallAuthManClients(GameObject ball)
     {
-		Debug.Log (ball);
-		if (ball == null) {
-			Debug.Log ("ball is null");
-		}
+        Debug.Log(ball);
+        if (ball == null)
+        {
+            Debug.Log("ball is null");
+        }
         AuthorityManager ballAuthMan = ball.GetComponent<AuthorityManager>();
         if (ballAuthMan == null)
         {
