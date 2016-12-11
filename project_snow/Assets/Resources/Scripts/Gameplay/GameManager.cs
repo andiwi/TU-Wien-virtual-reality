@@ -1,19 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
+using System.Collections.Generic;
 
 /// <summary>
 /// Game Manager 
 /// </summary>
 public class GameManager : NetworkBehaviour
 {
-	[SyncVar]
-	private int playerLife = 100;
+    [SyncVar]
+    private int playerLife = 100;
 
-	[SyncVar]
-	private int enemiesAlive = 0;
+    [SyncVar]
+    private int enemiesAlive = 0;
 
-	private GUIText gameStatus;
+    private GUIText gameStatus;
 
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
@@ -24,76 +25,104 @@ public class GameManager : NetworkBehaviour
 
     }
 
-    GameObject[] players;
-
+    //ONLY SET ON CLIENTS
     public Actor localActor { get; set; }
+
+
+    //ONLY SET ON SERVER 
+    //[SyncVar]
+    private List<GameObject> players;
 
     void Start()
     {
 
-        Debug.Log("GameManager startet: isClient: " + isClient+ " isServer: " + isServer  +" isLocalPalyer:" +isLocalPlayer );
+        Debug.Log("GameManager startet: isClient: " + isClient + " isServer: " + isServer + " isLocalPalyer:" + isLocalPlayer);
 
-        players = GameObject.FindGameObjectsWithTag("Player");
-		gameStatus = this.GetComponentInChildren<GUIText> ();
+        players = new List<GameObject>();
+
+        gameStatus = this.GetComponentInChildren<GUIText>();
         if (gameStatus)
         {
             gameStatus.text = "Life: " + playerLife;
-        }		
+        }
     }
 
-    public GameObject[] GetPlayers()
+    public List<GameObject> GetPlayers()
     {
         return players;
     }
 
-	public void HitByEnemySnowball() {
-		if (!isServer) {
-			return;
-		}
+    [Server]
+    public void AddPlayer(GameObject player)
+    {
+        players.Add(player);
+        print("GameManager.AddPlayer - playerCount:" + players.Count);
+    }
 
-		updateGameStatus (playerLife, enemiesAlive);
-		RpcUpdateStatus (playerLife, enemiesAlive);
-	}
+    public void HitByEnemySnowball()
+    {
+        if (!isServer)
+        {
+            return;
+        }
 
-	private void gameOver() {
-		gameStatus.text = "GAME OVER!";
-	}
+        updateGameStatus(playerLife, enemiesAlive);
+        RpcUpdateStatus(playerLife, enemiesAlive);
+    }
 
-	private void gameWin() {
-		gameStatus.text = "YOU WON!";
-	}
+    private void gameOver()
+    {
+        gameStatus.text = "GAME OVER!";
+    }
 
-	private void updateGameStatus(int playerLife, int enemiesAlive) {
-		if (enemiesAlive == 0) {
-			gameWin ();
-		} else {
-			if (playerLife > 0) {
-				gameStatus.text = "Life: " + playerLife;
-			} else {
-				gameOver ();
-			}
-		}
-	}
+    private void gameWin()
+    {
+        gameStatus.text = "YOU WON!";
+    }
 
-	[ClientRpc]
-	public void RpcUpdateStatus(int playerLife, int enemiesAlive) {
-		updateGameStatus (playerLife, enemiesAlive);
-	}
+    private void updateGameStatus(int playerLife, int enemiesAlive)
+    {
+        if (enemiesAlive == 0)
+        {
+            gameWin();
+        }
+        else
+        {
+            if (playerLife > 0)
+            {
+                gameStatus.text = "Life: " + playerLife;
+            }
+            else
+            {
+                gameOver();
+            }
+        }
+    }
 
-	public void IncreaseEnemiesAlive() {
-		if (!isServer) {
-			return;
-		}
-		enemiesAlive++;
-	}
+    [ClientRpc]
+    public void RpcUpdateStatus(int playerLife, int enemiesAlive)
+    {
+        updateGameStatus(playerLife, enemiesAlive);
+    }
 
-	public void DecreaseEnemiesAlive() {
-		if (!isServer) {
-			return;
-		}
-		enemiesAlive--;
-		updateGameStatus (playerLife, enemiesAlive);
-		RpcUpdateStatus (playerLife, enemiesAlive);
-	}
+    public void IncreaseEnemiesAlive()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        enemiesAlive++;
+    }
+
+    public void DecreaseEnemiesAlive()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+        enemiesAlive--;
+        updateGameStatus(playerLife, enemiesAlive);
+        RpcUpdateStatus(playerLife, enemiesAlive);
+    }
 }
 

@@ -51,7 +51,8 @@ public class Actor : NetworkBehaviour
             else if (isServer)
             {
                 //SERVER ONLY
-                Debug.Log("Actor: " + " is DEDICATED SERVER");   
+                Debug.Log("Actor: " + " is on DEDICATED SERVER");
+                GameManager.Instance.AddPlayer(gameObject);
             }       
 
             //*******************************
@@ -277,5 +278,6 @@ public class Actor : NetworkBehaviour
             debugLog("CmdAssignObjectAuthorityToClient - ERROR: no authmanObject found");
         }
     }
+
     //*******************************
 }
