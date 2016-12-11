@@ -162,13 +162,21 @@ public class TeleportVive : MonoBehaviour {
                     Vector3 offset = OriginTransform.position - HeadTransform.position;
                     offset.y = 0;
                     OriginTransform.position = Pointer.SelectedPoint + offset;
+                    print("VIVE TELEPORT!");
+                    //TODO NetworkTeleport here! 
+
+                    if (NetworkTeleportation.Singleton)
+                    {
+                        //NetworkTeleportation only active when connected
+                        NetworkTeleportation.Singleton.initTeleportation(OriginTransform.position);
+                    }
                 }
 
                 TeleportTimeMarker = Time.time;
                 FadingIn = !FadingIn;
              
             }
-            print("VIVE TELEPORT!");
+          
             return;
         }
 

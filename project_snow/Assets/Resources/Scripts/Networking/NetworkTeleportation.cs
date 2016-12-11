@@ -7,18 +7,16 @@ public class NetworkTeleportation : NetworkBehaviour
 {
     public static NetworkTeleportation Singleton { get; private set; }
 
+    public Vector3 leapPlayerOffset = new Vector3(1, 0, 0);
+
     void Awake()
     {
         Singleton = this;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    //called by vive client
+    /// <summary>
+    ///     called by vive client with new position to teleport to
+    /// </summary>
     [Client]
     public void initTeleportation(Vector3 newPosition)
     {
@@ -28,18 +26,12 @@ public class NetworkTeleportation : NetworkBehaviour
 
     //received by server
     [Command]
-    public void CmdTeleport(Vector3 newPosition)
+    private void CmdTeleport(Vector3 newPosition)
     {
         //List<GameObject> players = GameManager.Instance.GetPlayers();
         //GameObject leapPlayer = players.Find(curr => "LeapPlayer".Equals(curr.name));
 
         RpcNotifyTeleportation(newPosition);
-
-        /*
-         *        AuthorityManager authMan = sharedObjects.Find(curr => curr.GetNetworkIdentity().Equals(netID));
-        if (authMan != null)
-            authMan.AssignClientAuthority(connectionToClient);
-            */
     }
 
     //received by clients, further processed by clients with leapController
@@ -50,12 +42,13 @@ public class NetworkTeleportation : NetworkBehaviour
 
         if (leapController)
         {
-            print("NetworkTeleportation - client has leapController: do teleportation!");
-            leapController.transform.position = newPosition;
+            print("NetworkTeleportation - client has active leapController: do teleportation!");
+            leapController.transform.position = newPosition + leapPlayerOffset; //a offset to Vive player - experiment this
+           
         }
         else
         {
-            print("NetworkTeleportation - client has no leapController, ignore teleportation");
+            print("NetworkTeleportation - client has no active leapController, ignore teleportation");
         }
     }
 }
