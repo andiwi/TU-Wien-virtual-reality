@@ -288,6 +288,12 @@ public class AuthorityManager : NetworkBehaviour
     [Command]
     public void CmdThrowObject(Vector3 velocity, Vector3 angularVelocity)
     {
+        ThrowObjectServer(velocity, angularVelocity);
+    }
+
+    [Server]
+    public void ThrowObjectServer(Vector3 velocity, Vector3 angularVelocity)
+    {
         Vector3 force = velocity * forceStrength;
         Vector3 torque = angularVelocity * torqueStrength;
         debugLog("ThrowObject - force: " + force + " , torque: " + torque);
@@ -295,9 +301,10 @@ public class AuthorityManager : NetworkBehaviour
         //rigidbody.isKinematic = false;
         //TODO might be some delay, but lets try
         rigidbody = gameObject.GetComponent<Rigidbody>();
+        rigidbody.isKinematic = false;
+        rigidbody.AddForce(new Vector3(0, 300, 500));
         rigidbody.AddForce(force);
-        rigidbody.AddTorque(torque);
-
+        //rigidbody.AddTorque(torque);
     }
 
     [Client]
