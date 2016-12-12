@@ -24,6 +24,8 @@ public class BallLauncher : NetworkBehaviour
 
     public float targetPosVariation = 4;
 
+    private int rndWaitingTime = 0;
+
     void Start()
     {
         if (snowballContainer == null)
@@ -37,7 +39,8 @@ public class BallLauncher : NetworkBehaviour
         if (isServer == false) { return; }
 
         timer += Time.deltaTime;
-        if (timer > waitingTime)
+ 
+        if (timer > waitingTime+rndWaitingTime)
         {
             //Action
             GameObject targetPlayer = SelectPlayer();
@@ -53,6 +56,8 @@ public class BallLauncher : NetworkBehaviour
 
                 Debug.Log("instantiated ball: " + ball.name);
                 Launch(ball, targetPlayer.transform);
+
+                rndWaitingTime = Random.RandomRange(-5, 5);
             }
 
             timer = 0;
