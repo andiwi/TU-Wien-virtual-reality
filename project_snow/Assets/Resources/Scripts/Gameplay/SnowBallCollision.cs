@@ -2,10 +2,11 @@
 using System.Collections;
 
 public class SnowBallCollision : MonoBehaviour {
-
+    private GameManager gameManager;
 	// Use this for initialization
 	void Start () {
-	
+        GameObject gameManagerObj = GameObject.Find("GameManager");
+        gameManager = gameManagerObj.GetComponent<GameManager>();
 	}
 	
 	// Update is called once per frame
@@ -16,7 +17,12 @@ public class SnowBallCollision : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        print("OnCollisionEnter Snowball / switching tag");
-        gameObject.tag = "enemySnowballDeactivated";
+        if (collision.collider.tag == "Player")
+        {
+            print("HitByEnemySnowball");
+            gameManager.HitByEnemySnowball();                    
+        }
+        //print("OnCollisionEnter Snowball / switching tag");
+        gameObject.tag = "enemySnowballDeactivated";   
     }
 }
