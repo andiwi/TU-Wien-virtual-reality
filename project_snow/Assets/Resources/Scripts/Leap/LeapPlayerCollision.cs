@@ -16,7 +16,7 @@ public class LeapPlayerCollision : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision) {
-		if (collision.collider.tag == "enemySnowball") {
+		if (collision.collider.tag == "enemySnowballActivated") {
 			gameManager.HitByEnemySnowball ();
 		}
 	}
