@@ -7,7 +7,7 @@ public class NetworkTeleportation : NetworkBehaviour
 {
     public static NetworkTeleportation Singleton { get; private set; }
 
-    public Vector3 leapPlayerOffset = new Vector3(1, 1.296f, -0.322f);
+    private Vector3 leapPlayerOffset = new Vector3(1, 1.296f, -0.322f);
 
     void Awake()
     {
