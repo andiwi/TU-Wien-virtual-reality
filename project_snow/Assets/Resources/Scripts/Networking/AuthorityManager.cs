@@ -302,9 +302,8 @@ public class AuthorityManager : NetworkBehaviour
         //TODO might be some delay, but lets try
         rigidbody = gameObject.GetComponent<Rigidbody>();
         rigidbody.isKinematic = false;
-        rigidbody.AddForce(new Vector3(0, 300, 500));
         rigidbody.AddForce(force);
-        //rigidbody.AddTorque(torque);
+        rigidbody.AddTorque(torque);
     }
 
     [Client]
