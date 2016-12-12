@@ -66,6 +66,7 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
+        this.playerLife = this.playerLife - 10;
         updateGameStatus(playerLife, enemiesAlive);
         RpcUpdateStatus(playerLife, enemiesAlive);
     }
