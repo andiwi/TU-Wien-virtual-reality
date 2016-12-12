@@ -281,8 +281,8 @@ public class AuthorityManager : NetworkBehaviour
     public void ThrowObject(Vector3 velocity, Vector3 angularVelocity)
     {
         debugLog("ThrowObject - velocity: " + velocity + " , angularVelocity: " + angularVelocity);
-        UnGrabObject();
         CmdThrowObject(velocity, angularVelocity);
+        UnGrabObject();
     }
 
     [Command]
